@@ -1,0 +1,1575 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、mini-swe-agent）">
+      
+      
+      
+      
+        <link rel="prev" href="../mini_swe_agent_study_notes_lecture1/">
+      
+      
+        <link rel="next" href="../mini_swe_agent_study_notes_lecture3/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>第二讲 交互状态机与 HITL - Agent 论文与源码学习笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mini-swe-agent-源码研读笔记第二讲交互状态机hitl-机制与通用配置穿透" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-header__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Agent 论文与源码学习笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第二讲 交互状态机与 HITL
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-nav__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Agent 论文与源码学习笔记
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ARG-Designer
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ARG-Designer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/paper-reading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    论文阅读笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/learning-outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    学习大纲
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mini-swe-agent
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    mini-swe-agent
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一讲 宏观架构与控制流
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第二讲 交互状态机与 HITL
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第二讲 交互状态机与 HITL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#目录" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        目录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-interactiveagent-继承与扩展全景" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. InteractiveAgent 继承与扩展全景
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. InteractiveAgent 继承与扩展全景">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心覆写方法矩阵" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心覆写方法矩阵
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-人机协作hitl四大防御机制由易到难" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 人机协作（HITL）四大防御机制（由易到难）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 人机协作（HITL）四大防御机制（由易到难）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#难度一动作执行前守门员_ask_confirmation_or_interrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度一：动作执行前“守门员”（_ask_confirmation_or_interrupt）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#难度二任务收尾的防偷懒验收_check_for_new_task_or_submit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度二：任务收尾的“防偷懒验收”（_check_for_new_task_or_submit）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#难度三运行中的紧急红按钮keyboardinterrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度三：运行中的“紧急红按钮”（KeyboardInterrupt）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#难度四架构级控制反转human-模式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度四：架构级控制反转（human 模式）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-输入收敛网关与斜杠命令系统" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 输入收敛网关与斜杠命令系统
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-动态-prompt-模板引擎jinja2-系统" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 动态 Prompt 模板引擎（Jinja2 系统）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 动态 Prompt 模板引擎（Jinja2 系统）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#变量大一统级联合并get_template_vars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        变量大一统级联合并（get_template_vars）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#防御性渲染strictundefined" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        防御性渲染（StrictUndefined）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#自适应与防溢出设计实战miniyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        自适应与防溢出设计实战（mini.yaml）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-通用命令行配置穿透机制config_spec-揭秘" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 通用命令行配置穿透机制（config_spec 揭秘）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 通用命令行配置穿透机制（config_spec 揭秘）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#内部经历的三级演化" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        内部经历的三级演化：
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="内部经历的三级演化：">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-typer-cli-收集原始字符串列表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Typer CLI 收集（原始字符串列表）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-spec-展开与点分语法解析get_config_from_spec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Spec 展开与点分语法解析（get_config_from_spec）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-递归合并recursive_merge-法则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 递归合并（recursive_merge 法则）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-测试工程学如何用自动化代码测试人机交互" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 测试工程学：如何用自动化代码测试人机交互
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-互动精要与代码排查四步心法" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 互动精要与代码排查四步心法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 互动精要与代码排查四步心法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#q1为什么必须写-return-superstep-而不能写-step-或-selfstep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q1：为什么必须写 return super().step() 而不能写 step() 或 self.step()？
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q2排查未知配置参数如-whitelist_actions的四步导航心法" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q2：排查未知配置参数（如 whitelist_actions）的“四步导航心法”
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第三讲 沙箱环境与安全流控
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第四讲 装饰器与 Tenacity 重试
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第五讲 日志与轨迹序列化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第六讲 命令行配置体系
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第七讲 打包规范与沙箱部署
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_derive_agents_md_playbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    番外 AGENTS.md 五步逆向讨论法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#目录" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        目录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-interactiveagent-继承与扩展全景" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. InteractiveAgent 继承与扩展全景
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. InteractiveAgent 继承与扩展全景">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心覆写方法矩阵" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心覆写方法矩阵
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-人机协作hitl四大防御机制由易到难" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 人机协作（HITL）四大防御机制（由易到难）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 人机协作（HITL）四大防御机制（由易到难）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#难度一动作执行前守门员_ask_confirmation_or_interrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度一：动作执行前“守门员”（_ask_confirmation_or_interrupt）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#难度二任务收尾的防偷懒验收_check_for_new_task_or_submit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度二：任务收尾的“防偷懒验收”（_check_for_new_task_or_submit）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#难度三运行中的紧急红按钮keyboardinterrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度三：运行中的“紧急红按钮”（KeyboardInterrupt）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#难度四架构级控制反转human-模式" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        难度四：架构级控制反转（human 模式）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-输入收敛网关与斜杠命令系统" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 输入收敛网关与斜杠命令系统
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-动态-prompt-模板引擎jinja2-系统" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 动态 Prompt 模板引擎（Jinja2 系统）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 动态 Prompt 模板引擎（Jinja2 系统）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#变量大一统级联合并get_template_vars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        变量大一统级联合并（get_template_vars）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#防御性渲染strictundefined" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        防御性渲染（StrictUndefined）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#自适应与防溢出设计实战miniyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        自适应与防溢出设计实战（mini.yaml）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-通用命令行配置穿透机制config_spec-揭秘" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 通用命令行配置穿透机制（config_spec 揭秘）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 通用命令行配置穿透机制（config_spec 揭秘）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#内部经历的三级演化" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        内部经历的三级演化：
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="内部经历的三级演化：">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-typer-cli-收集原始字符串列表" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Typer CLI 收集（原始字符串列表）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-spec-展开与点分语法解析get_config_from_spec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Spec 展开与点分语法解析（get_config_from_spec）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-递归合并recursive_merge-法则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 递归合并（recursive_merge 法则）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-测试工程学如何用自动化代码测试人机交互" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 测试工程学：如何用自动化代码测试人机交互
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-互动精要与代码排查四步心法" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 互动精要与代码排查四步心法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 互动精要与代码排查四步心法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#q1为什么必须写-return-superstep-而不能写-step-或-selfstep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q1：为什么必须写 return super().step() 而不能写 step() 或 self.step()？
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q2排查未知配置参数如-whitelist_actions的四步导航心法" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Q2：排查未知配置参数（如 whitelist_actions）的“四步导航心法”
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="mini-swe-agent-源码研读笔记第二讲交互状态机hitl-机制与通用配置穿透">mini-swe-agent 源码研读笔记（第二讲：交互状态机、HITL 机制与通用配置穿透）<a class="headerlink" href="#mini-swe-agent-源码研读笔记第二讲交互状态机hitl-机制与通用配置穿透" title="Permanent link">&para;</a></h1>
+<h2 id="目录">目录<a class="headerlink" href="#目录" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#1-interactiveagent-继承与扩展全景">InteractiveAgent 继承与扩展全景</a></li>
+<li><a href="#2-人机协作hitl四大防御机制由易到难">人机协作（HITL）四大防御机制（由易到难）</a></li>
+<li><a href="#3-输入收敛网关与斜杠命令系统">输入收敛网关与斜杠命令系统</a></li>
+<li><a href="#4-动态-prompt-模板引擎jinja2-系统">动态 Prompt 模板引擎（Jinja2 系统）</a></li>
+<li><a href="#5-通用命令行配置穿透机制config_spec-揭秘">通用命令行配置穿透机制（config_spec 揭秘）</a></li>
+<li><a href="#6-测试工程学如何用自动化代码测试人机交互">测试工程学：如何用自动化代码测试人机交互</a></li>
+<li><a href="#7-互动精要与代码排查四步心法">互动精要与代码排查四步心法</a></li>
+</ol>
+<hr />
+<h2 id="1-interactiveagent-继承与扩展全景">1. InteractiveAgent 继承与扩展全景<a class="headerlink" href="#1-interactiveagent-继承与扩展全景" title="Permanent link">&para;</a></h2>
+<p><code>mini-swe-agent</code> 在不修改基类 <code>DefaultAgent</code> 原有逻辑的前提下，通过面向对象继承派生了面向终端用户的 <code>InteractiveAgent</code>：</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">InteractiveAgent</span><span class="p">(</span><span class="n">DefaultAgent</span><span class="p">):</span>
+</code></pre></div>
+<h3 id="核心覆写方法矩阵">核心覆写方法矩阵<a class="headerlink" href="#核心覆写方法矩阵" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">覆写的方法</th>
+<th style="text-align: left;"><code>DefaultAgent</code>（父类批处理基线）</th>
+<th style="text-align: left;"><code>InteractiveAgent</code>（子类交互增强）</th>
+<th style="text-align: left;">工程意图</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><code>add_messages</code></strong></td>
+<td style="text-align: left;">仅存入内存 <code>self.messages</code> 列表</td>
+<td style="text-align: left;"><strong>Rich 富文本终端着色打印</strong></td>
+<td style="text-align: left;">红/绿色区分模型思考、动作与观察</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>step</code></strong></td>
+<td style="text-align: left;">纯粹执行 <code>execute_actions(query())</code></td>
+<td style="text-align: left;"><strong>画水平分割线 <code>Rule()</code> 并捕获 <code>KeyboardInterrupt</code></strong></td>
+<td style="text-align: left;">UI 视觉隔离每一步，防止 Ctrl+C 导致进程退出</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>execute_actions</code></strong></td>
+<td style="text-align: left;">拿到模型命令直接交给沙箱执行</td>
+<td style="text-align: left;"><strong>安全门神确认与收尾拦截</strong></td>
+<td style="text-align: left;">执行前让用户按 Enter 把关，拦截 <code>Submitted</code> 异常</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>query</code></strong></td>
+<td style="text-align: left;">纯粹向大模型 API 发起网络请求</td>
+<td style="text-align: left;"><strong>人类驾驶模式拦截</strong></td>
+<td style="text-align: left;">若处于 <code>human</code> 模式，直接读取人类手敲命令，不调模型</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-人机协作hitl四大防御机制由易到难">2. 人机协作（HITL）四大防御机制（由易到难）<a class="headerlink" href="#2-人机协作hitl四大防御机制由易到难" title="Permanent link">&para;</a></h2>
+<p><code>InteractiveAgent</code> 构建了由浅入深的人机干预防护网：</p>
+<div class="highlight"><pre><span></span><code>[难度一：命令守门] ──► 每次模型出招，人类按 Enter 放行或输入驳回
+        │
+[难度二：收尾验收] ──► 模型打印暗号交卷，拦截 Submitted 异常，允许人类追加新需求
+        │
+[难度三：运行突发] ──► 模型陷入死循环或胡言乱语，人类按 Ctrl+C 紧急打断
+        │
+[难度四：控制反转] ──► 彻底屏蔽大模型，人类接管驾驶，命令伪装成 Action 喂给环境
+</code></pre></div>
+<h3 id="难度一动作执行前守门员_ask_confirmation_or_interrupt">难度一：动作执行前“守门员”（<code>_ask_confirmation_or_interrupt</code>）<a class="headerlink" href="#难度一动作执行前守门员_ask_confirmation_or_interrupt" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>触发位置</strong>：<code>interactive.py</code> 第 138 行，在调用 <code>self.env.execute(action)</code> 的前一毫秒。</li>
+<li><strong>核心代码</strong>：
+  <div class="highlight"><pre><span></span><code><span class="k">match</span> <span class="n">user_input</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_and_handle_slash_commands</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+    <span class="k">case</span> <span class="s2">""</span> <span class="o">|</span> <span class="s2">"/y"</span><span class="p">:</span>
+        <span class="k">pass</span>  <span class="c1"># 【放行】：按回车或 /y，函数正常结束，代码滑到下一行 env.execute</span>
+    <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+        <span class="c1"># 【驳回】：输入了拒绝理由，抛出异常，阻止命令执行！</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Commands not executed. The user rejected with: </span><span class="si">{</span><span class="n">user_input</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="s2">"UserRejection"</span><span class="p">)</span>
+</code></pre></div></li>
+</ul>
+<h3 id="难度二任务收尾的防偷懒验收_check_for_new_task_or_submit">难度二：任务收尾的“防偷懒验收”（<code>_check_for_new_task_or_submit</code>）<a class="headerlink" href="#难度二任务收尾的防偷懒验收_check_for_new_task_or_submit" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>触发位置</strong>：<code>interactive.py</code> 第 143 行，捕获沙箱环境抛出的 <code>Submitted</code> 异常。</li>
+<li><strong>核心代码</strong>：
+  <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_check_for_new_task_or_submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">Submitted</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">confirm_exit</span><span class="p">:</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_and_handle_slash_commands</span><span class="p">(</span><span class="s2">"Agent wants to finish..."</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user_input</span><span class="p">:</span>
+            <span class="c1"># 用户追加了新任务（如："别急着交卷，先跑 pytest！"），强制续命</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interrupt</span><span class="p">(</span><span class="sa">f</span><span class="s2">"The user added a new task: </span><span class="si">{</span><span class="n">user_input</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="s2">"UserNewTask"</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="n">e</span>  <span class="c1"># 仅当用户敲回车时，才真正把 Submitted 重新抛出收工</span>
+</code></pre></div></li>
+</ul>
+<h3 id="难度三运行中的紧急红按钮keyboardinterrupt">难度三：运行中的“紧急红按钮”（<code>KeyboardInterrupt</code>）<a class="headerlink" href="#难度三运行中的紧急红按钮keyboardinterrupt" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>触发位置</strong>：<code>interactive.py</code> 第 112 行，在 <code>step()</code> 外部包装 <code>try...except</code>。</li>
+<li><strong>核心机制</strong>：用户按 <code>Ctrl+C</code> 不会崩溃退出，而是被捕获，并在终端弹窗询问人类要给模型补充什么指示，将键盘中断平滑转化为一条 <code>UserInterruption</code> 上下文提示。</li>
+</ul>
+<h3 id="难度四架构级控制反转human-模式">难度四：架构级控制反转（<code>human</code> 模式）<a class="headerlink" href="#难度四架构级控制反转human-模式" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>触发位置</strong>：<code>interactive.py</code> 第 58 行，在 <code>query()</code> 内部拦截。</li>
+<li><strong>核心代码</strong>：
+  <div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">"human"</span><span class="p">:</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_and_handle_slash_commands</span><span class="p">(</span><span class="s2">"&gt; "</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span>
+        <span class="s2">"content"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"User command: </span><span class="se">\n</span><span class="s2">```bash</span><span class="se">\n</span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="se">\n</span><span class="s2">```"</span><span class="p">,</span>
+        <span class="s2">"extra"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"actions"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"command"</span><span class="p">:</span> <span class="n">command</span><span class="p">}]},</span>  <span class="c1"># 伪造成动作结构！</span>
+    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_messages</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">msg</span>  <span class="c1"># 直接返回，欺骗下游的 execute_actions！</span>
+</code></pre></div></li>
+<li><strong>控制反转精髓</strong>：下游沙箱根本不知道这个 Action 来自人类还是大模型。它忠实执行并将终端输出追加为 Observation，实现了人类与大模型在同一个对话历史中无缝交替驾驶。</li>
+</ul>
+<hr />
+<h2 id="3-输入收敛网关与斜杠命令系统">3. 输入收敛网关与斜杠命令系统<a class="headerlink" href="#3-输入收敛网关与斜杠命令系统" title="Permanent link">&para;</a></h2>
+<p>为了避免在每个需要人类输入的地方重复编写 <code>input()</code> 和命令解析，代码采用了<strong>控制收敛模式</strong>：</p>
+<div class="highlight"><pre><span></span><code>1. query()               ───┐
+2. _ask_confirmation()   ───┼──► _prompt_and_handle_slash_commands() ──► 统一拦截 /c, /y, /u, /h, /m
+3. KeyboardInterrupt     ───┤
+4. _check_for_new_task() ───┘
+</code></pre></div>
+<ul>
+<li><strong>支持的动态模式切换</strong>：</li>
+<li><code>/y</code> $\to$ 切换为 <code>yolo</code>（全自动，不再确认）</li>
+<li><code>/c</code> $\to$ 切换为 <code>confirm</code>（每步确认）</li>
+<li><code>/u</code> $\to$ 切换为 <code>human</code>（人类手敲命令）</li>
+<li><code>/h</code> $\to$ 打印当前帮助菜单</li>
+<li><code>/m</code> $\to$ 开启多行输入模式（Multiline Prompt）</li>
+</ul>
+<hr />
+<h2 id="4-动态-prompt-模板引擎jinja2-系统">4. 动态 Prompt 模板引擎（Jinja2 系统）<a class="headerlink" href="#4-动态-prompt-模板引擎jinja2-系统" title="Permanent link">&para;</a></h2>
+<p>在 <code>DefaultAgent</code> 中，Prompt 并非静态文本，而是由 Jinja2 模板在每一步动态渲染产生。</p>
+<h3 id="变量大一统级联合并get_template_vars">变量大一统级联合并（<code>get_template_vars</code>）<a class="headerlink" href="#变量大一统级联合并get_template_vars" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_template_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">recursive_merge</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>   <span class="c1"># Agent 静态配置</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_template_vars</span><span class="p">(),</span> <span class="c1"># 操作系统信息（system == "Darwin", uname）</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_template_vars</span><span class="p">(),</span>
+        <span class="p">{</span>
+            <span class="s2">"n_model_calls"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_calls</span><span class="p">,</span>
+            <span class="s2">"model_cost"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="p">,</span>
+            <span class="s2">"elapsed_seconds"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_template_vars</span><span class="p">,</span>   <span class="c1"># 用户当前 task 文本</span>
+        <span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<h3 id="防御性渲染strictundefined">防御性渲染（<code>StrictUndefined</code>）<a class="headerlink" href="#防御性渲染strictundefined" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><span class="n">Template</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">undefined</span><span class="o">=</span><span class="n">StrictUndefined</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">get_template_vars</span><span class="p">())</span>
+</code></pre></div>
+* <strong>工业意义</strong>：常规 Jinja2 遇到未定义变量会静默替换为空字符串。使用 <code>StrictUndefined</code> 强制校验，模板里一旦拼错变量名立即抛出异常，绝不给大模型喂残缺的提示词。</p>
+<h3 id="自适应与防溢出设计实战miniyaml">自适应与防溢出设计实战（<code>mini.yaml</code>）<a class="headerlink" href="#自适应与防溢出设计实战miniyaml" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>OS 自适应</strong>：
+   <div class="highlight"><pre><span></span><code>{%- if system == "Darwin" -%}
+You are on MacOS. Use `sed -i ''` instead of `sed -i`.
+{%- endif -%}
+</code></pre></div></li>
+<li><strong>长输出熔断截断（防止 Context Window 溢出）</strong>：
+   <div class="highlight"><pre><span></span><code>{%- if output.output | length &lt; 10000 -%}
+  "output": {{ output.output | tojson }}
+{%- else -%}
+  "output_head": {{ output.output[:5000] | tojson }},
+  "output_tail": {{ output.output[-5000:] | tojson }},
+  "warning": "Output too long. Elided {{ output.output | length - 10000 }} chars."
+{%- endif -%}
+</code></pre></div></li>
+</ol>
+<hr />
+<h2 id="5-通用命令行配置穿透机制config_spec-揭秘">5. 通用命令行配置穿透机制（config_spec 揭秘）<a class="headerlink" href="#5-通用命令行配置穿透机制config_spec-揭秘" title="Permanent link">&para;</a></h2>
+<p>当在 CLI 中输入：
+<div class="highlight"><pre><span></span><code>mini<span class="w"> </span>-c<span class="w"> </span>mini.yaml<span class="w"> </span>-c<span class="w"> </span>other.yaml<span class="w"> </span>-c<span class="w"> </span><span class="s2">"agent.cost_limit=10.0"</span>
+</code></pre></div></p>
+<h3 id="内部经历的三级演化">内部经历的三级演化：<a class="headerlink" href="#内部经历的三级演化" title="Permanent link">&para;</a></h3>
+<h4 id="1-typer-cli-收集原始字符串列表">1. Typer CLI 收集（原始字符串列表）<a class="headerlink" href="#1-typer-cli-收集原始字符串列表" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">config_spec</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"mini.yaml"</span><span class="p">,</span> <span class="s2">"other.yaml"</span><span class="p">,</span> <span class="s2">"agent.cost_limit=10.0"</span><span class="p">]</span>
+</code></pre></div>
+<h4 id="2-spec-展开与点分语法解析get_config_from_spec">2. Spec 展开与点分语法解析（<code>get_config_from_spec</code>）<a class="headerlink" href="#2-spec-展开与点分语法解析get_config_from_spec" title="Permanent link">&para;</a></h4>
+<ul>
+<li>若无等号：读取并解析 YAML 文件为字典。</li>
+<li>若含等号（<code>_key_value_spec_to_nested_dict</code>）：按点号拆分为多层嵌套字典：
+  <code>"agent.cost_limit=10.0"</code> $\to$ <code>{"agent": {"cost_limit": 10.0}}</code></li>
+</ul>
+<h4 id="3-递归合并recursive_merge-法则">3. 递归合并（<code>recursive_merge</code> 法则）<a class="headerlink" href="#3-递归合并recursive_merge-法则" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p><strong>“Later dictionaries take precedence over earlier ones. Nested dictionaries are merged recursively.”</strong></p>
+</blockquote>
+<p>排在后面的字典拥有最高优先级，精准覆盖前面字典的同名 key，而保留未冲突的字段。
+* <strong>架构价值</strong>：无需为每个内部配置编写 CLI 参数，底层所有参数均可通过 <code>-c key.subkey=value</code> 无缝穿透覆盖。</p>
+<hr />
+<h2 id="6-测试工程学如何用自动化代码测试人机交互">6. 测试工程学：如何用自动化代码测试人机交互<a class="headerlink" href="#6-测试工程学如何用自动化代码测试人机交互" title="Permanent link">&para;</a></h2>
+<p>在 <code>tests/agents/test_interactive.py</code> 中，展示了工业级测试三大核心手法：</p>
+<ol>
+<li><strong><code>unittest.mock.patch</code> 模拟人类按键</strong>：
+   <div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">mock_prompts</span><span class="p">([</span><span class="s2">"User rejected"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">""</span><span class="p">]):</span>  <span class="c1"># 模拟人类先驳回、再确认、最后退出的敲键盘序列</span>
+    <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"task"</span><span class="p">)</span>
+</code></pre></div></li>
+<li><strong><code>DeterministicModel</code> 0 成本确定性模型</strong>：
+   预定义模型返回的文字与工具调用，不花 API 费，毫秒级运行，输出完全可预测。</li>
+<li><strong>Mock 突发异常</strong>：
+   通过 <code>patch.object(agent, "query", side_effect=KeyboardInterrupt)</code> 模拟人类突然按下 Ctrl+C。</li>
+</ol>
+<hr />
+<h2 id="7-互动精要与代码排查四步心法">7. 互动精要与代码排查四步心法<a class="headerlink" href="#7-互动精要与代码排查四步心法" title="Permanent link">&para;</a></h2>
+<h3 id="q1为什么必须写-return-superstep-而不能写-step-或-selfstep">Q1：为什么必须写 <code>return super().step()</code> 而不能写 <code>step()</code> 或 <code>self.step()</code>？<a class="headerlink" href="#q1为什么必须写-return-superstep-而不能写-step-或-selfstep" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>写 <code>step()</code></strong>：报 <code>NameError</code>，因为当前作用域没有叫 <code>step</code> 的独立全局函数。</li>
+<li><strong>写 <code>self.step()</code></strong>：报 <code>RecursionError</code>（无限递归爆栈），因为正在 <code>InteractiveAgent.step</code> 内部，调 <code>self.step</code> 属于调用自己。</li>
+<li><strong>写 <code>super().step()</code></strong>：跳过当前类的实现，执行父类 <code>DefaultAgent</code> 里的真实 ReAct 核心逻辑，同时保留子类的 <code>Rule()</code> 划线和键盘打断防护（经典的面向对象方法增强模式）。</li>
+</ul>
+<h3 id="q2排查未知配置参数如-whitelist_actions的四步导航心法">Q2：排查未知配置参数（如 <code>whitelist_actions</code>）的“四步导航心法”<a class="headerlink" href="#q2排查未知配置参数如-whitelist_actions的四步导航心法" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>遇到源码中的 self.config.foo
+      │
+      ├── 1. 点进 Config 类 ──────► 查类型、默认值（如 []）与 docstring
+      │
+      ├── 2. 全局搜索 "foo" ──────► 查源码消费点（re.match 过滤）
+      │
+      ├── 3. 点进 tests/ ────────► 看测试用例最权威的真实示范（如 [r"echo.*"]）
+      │
+      └── 4. 查 CLI 的 -c / spec ──► 确认它是通过通用点分语法注入的
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

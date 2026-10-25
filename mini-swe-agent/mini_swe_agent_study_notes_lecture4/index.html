@@ -1,0 +1,1423 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、mini-swe-agent）">
+      
+      
+      
+      
+        <link rel="prev" href="../mini_swe_agent_study_notes_lecture3/">
+      
+      
+        <link rel="next" href="../mini_swe_agent_study_notes_lecture5/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>第四讲 装饰器与 Tenacity 重试 - Agent 论文与源码学习笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mini-swe-agent-源码研读笔记第四讲工程级装饰器描述符底层与-tenacity-弹性重试" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-header__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Agent 论文与源码学习笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第四讲 装饰器与 Tenacity 重试
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-nav__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Agent 论文与源码学习笔记
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ARG-Designer
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ARG-Designer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/paper-reading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    论文阅读笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/learning-outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    学习大纲
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mini-swe-agent
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    mini-swe-agent
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一讲 宏观架构与控制流
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第二讲 交互状态机与 HITL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第三讲 沙箱环境与安全流控
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第四讲 装饰器与 Tenacity 重试
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第四讲 装饰器与 Tenacity 重试
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#目录" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        目录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-装饰器的第一性原理与语法糖本质" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 装饰器的第一性原理与语法糖本质
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 装饰器的第一性原理与语法糖本质">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#语法糖的物理等价" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        语法糖的物理等价：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-高频核心装饰器实战解密" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 高频核心装饰器实战解密
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 高频核心装饰器实战解密">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-property属性化封装" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. @property（属性化封装）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-staticmethod无状态静态工具" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. @staticmethod（无状态静态工具）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-appcommand命令行路由注册" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. @app.command()（命令行路由注册）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-深入底层property-描述符协议与无括号之谜" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 深入底层：@property 描述符协议与无括号之谜
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 深入底层：@property 描述符协议与无括号之谜">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心疑问为什么加了-property-后调用不需要括号如果加了括号会报什么错" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心疑问：为什么加了 @property 后调用不需要括号？如果加了括号会报什么错？
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#描述符工作原理解密" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        描述符工作原理解密：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-python-私有变量与方法的工程哲学" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Python 私有变量与方法的工程哲学
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Python 私有变量与方法的工程哲学">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#成年人法则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        “成年人法则”：
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#单下划线-_-的全景应用" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单下划线 _ 的全景应用：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-tenacity-弹性重试机制与上下文管理器跃迁" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Tenacity 弹性重试机制与上下文管理器跃迁
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Tenacity 弹性重试机制与上下文管理器跃迁">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心工程精髓" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心工程精髓：
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="核心工程精髓：">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-为什么不用固定的-retry-装饰器而改用上下文管理器循环" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 为什么不用固定的 @retry 装饰器，而改用上下文管理器循环？
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-指数退避exponential-backoffvs-盲目狂刷" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 指数退避（Exponential Backoff）vs 盲目狂刷
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-防御性拦截名单abort_exceptions与-ctrlc-死循环警示" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 防御性拦截名单（abort_exceptions）与 Ctrl+C 死循环警示
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-互动问答精要复盘" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 互动问答精要复盘
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第五讲 日志与轨迹序列化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第六讲 命令行配置体系
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第七讲 打包规范与沙箱部署
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_derive_agents_md_playbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    番外 AGENTS.md 五步逆向讨论法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#目录" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        目录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-装饰器的第一性原理与语法糖本质" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 装饰器的第一性原理与语法糖本质
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 装饰器的第一性原理与语法糖本质">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#语法糖的物理等价" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        语法糖的物理等价：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-高频核心装饰器实战解密" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 高频核心装饰器实战解密
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 高频核心装饰器实战解密">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-property属性化封装" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. @property（属性化封装）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-staticmethod无状态静态工具" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. @staticmethod（无状态静态工具）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-appcommand命令行路由注册" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. @app.command()（命令行路由注册）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-深入底层property-描述符协议与无括号之谜" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 深入底层：@property 描述符协议与无括号之谜
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 深入底层：@property 描述符协议与无括号之谜">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心疑问为什么加了-property-后调用不需要括号如果加了括号会报什么错" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心疑问：为什么加了 @property 后调用不需要括号？如果加了括号会报什么错？
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#描述符工作原理解密" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        描述符工作原理解密：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-python-私有变量与方法的工程哲学" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Python 私有变量与方法的工程哲学
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Python 私有变量与方法的工程哲学">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#成年人法则" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        “成年人法则”：
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#单下划线-_-的全景应用" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        单下划线 _ 的全景应用：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-tenacity-弹性重试机制与上下文管理器跃迁" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Tenacity 弹性重试机制与上下文管理器跃迁
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Tenacity 弹性重试机制与上下文管理器跃迁">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心工程精髓" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心工程精髓：
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="核心工程精髓：">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-为什么不用固定的-retry-装饰器而改用上下文管理器循环" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 为什么不用固定的 @retry 装饰器，而改用上下文管理器循环？
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-指数退避exponential-backoffvs-盲目狂刷" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 指数退避（Exponential Backoff）vs 盲目狂刷
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-防御性拦截名单abort_exceptions与-ctrlc-死循环警示" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 防御性拦截名单（abort_exceptions）与 Ctrl+C 死循环警示
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-互动问答精要复盘" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 互动问答精要复盘
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="mini-swe-agent-源码研读笔记第四讲工程级装饰器描述符底层与-tenacity-弹性重试">mini-swe-agent 源码研读笔记（第四讲：工程级装饰器、描述符底层与 Tenacity 弹性重试）<a class="headerlink" href="#mini-swe-agent-源码研读笔记第四讲工程级装饰器描述符底层与-tenacity-弹性重试" title="Permanent link">&para;</a></h1>
+<h2 id="目录">目录<a class="headerlink" href="#目录" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#1-装饰器的第一性原理与语法糖本质">装饰器的第一性原理与语法糖本质</a></li>
+<li><a href="#2-高频核心装饰器实战解密">高频核心装饰器实战解密</a></li>
+<li><a href="#3-深入底层property-描述符协议与无括号之谜">深入底层：@property 描述符协议与无括号之谜</a></li>
+<li><a href="#4-python-私有变量与方法的工程哲学">Python 私有变量与方法的工程哲学</a></li>
+<li><a href="#5-tenacity-弹性重试机制与上下文管理器跃迁">Tenacity 弹性重试机制与上下文管理器跃迁</a></li>
+<li><a href="#6-互动问答精要复盘">互动问答精要复盘</a></li>
+</ol>
+<hr />
+<h2 id="1-装饰器的第一性原理与语法糖本质">1. 装饰器的第一性原理与语法糖本质<a class="headerlink" href="#1-装饰器的第一性原理与语法糖本质" title="Permanent link">&para;</a></h2>
+<p>在 Python 中，函数是一等公民（First-class citizen），可以像普通变量一样作为参数传递和作为返回值返回。</p>
+<h3 id="语法糖的物理等价">语法糖的物理等价：<a class="headerlink" href="#语法糖的物理等价" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><span class="nd">@log_decorator</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">say_hello</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">)</span>
+</code></pre></div>
+在 Python 解释器底层 100% 等价于：
+<div class="highlight"><pre><span></span><code><span class="n">say_hello</span> <span class="o">=</span> <span class="n">log_decorator</span><span class="p">(</span><span class="n">say_hello</span><span class="p">)</span>
+</code></pre></div>
+* <strong>本质</strong>：装饰器就是一个“接收旧函数、包裹新逻辑、返回新函数”的高阶函数。</p>
+<hr />
+<h2 id="2-高频核心装饰器实战解密">2. 高频核心装饰器实战解密<a class="headerlink" href="#2-高频核心装饰器实战解密" title="Permanent link">&para;</a></h2>
+<p>在 <code>mini-swe-agent</code> 中，最核心的 3 个装饰器构成了系统的接口封装与路由骨干：</p>
+<h3 id="1-property属性化封装">1. <code>@property</code>（属性化封装）<a class="headerlink" href="#1-property属性化封装" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>源码位置</strong>：<code>src/minisweagent/models/__init__.py:GlobalModelStats</code></li>
+<li><strong>应用场景</strong>：
+  <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">GlobalModelStats</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cost</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cost</span>
+</code></pre></div></li>
+<li><strong>工程价值</strong>：将类方法伪装成只读属性。外部读取写 <code>stats.cost</code>（不用加括号）；若外部试图强行赋值 <code>stats.cost = 10</code>，Python 立即报错拦截，保护全局数据不被篡改。</li>
+</ul>
+<h3 id="2-staticmethod无状态静态工具">2. <code>@staticmethod</code>（无状态静态工具）<a class="headerlink" href="#2-staticmethod无状态静态工具" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>源码位置</strong>：<code>src/minisweagent/agents/interactive.py</code> 第 96 行</li>
+<li><strong>应用场景</strong>：<code>_stdin_is_interactive()</code> 检查当前终端是否连接了人类键盘。</li>
+<li><strong>工程价值</strong>：告诉 Python 不需要传入 <code>self</code> 实例指针。该方法不依赖也不修改类的任何状态，纯粹作为一个挂在类命名空间下的纯工具函数，节省参数绑定开销并提高可读性。</li>
+</ul>
+<h3 id="3-appcommand命令行路由注册">3. <code>@app.command()</code>（命令行路由注册）<a class="headerlink" href="#3-appcommand命令行路由注册" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>源码位置</strong>：<code>src/minisweagent/run/mini.py</code> 第 54 行</li>
+<li><strong>工程价值</strong>：在模块加载瞬间，抓取函数名、函数签名和类型注解，注册进 Typer 的命令路由表，自动生成 CLI 终端帮助文档。</li>
+</ul>
+<hr />
+<h2 id="3-深入底层property-描述符协议与无括号之谜">3. 深入底层：@property 描述符协议与无括号之谜<a class="headerlink" href="#3-深入底层property-描述符协议与无括号之谜" title="Permanent link">&para;</a></h2>
+<h3 id="核心疑问为什么加了-property-后调用不需要括号如果加了括号会报什么错">核心疑问：为什么加了 <code>@property</code> 后调用不需要括号？如果加了括号会报什么错？<a class="headerlink" href="#核心疑问为什么加了-property-后调用不需要括号如果加了括号会报什么错" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>加括号报错</strong>：报 <strong><code>TypeError: 'int' object is not callable</code></strong>。因为属性已经计算出了整数（如 <code>10</code>），对整数执行括号相当于执行 <code>10()</code>。</li>
+<li><strong>为什么不需要括号</strong>：借用了 Python 的 <strong>描述符协议（Descriptor Protocol）</strong>。</li>
+</ul>
+<h3 id="描述符工作原理解密">描述符工作原理解密：<a class="headerlink" href="#描述符工作原理解密" title="Permanent link">&para;</a></h3>
+<p><code>property</code> 是 Python 的内置类，它实现了 <code>__get__</code> 魔术方法：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 简化的 property 核心实现机制</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyProperty</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>  <span class="c1"># 保存原本的被装饰函数</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">owner</span><span class="p">):</span>
+        <span class="c1"># 核心真相：描述符在幕后亲自执行了带有括号的函数调用！</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+</code></pre></div>
+<p><div class="highlight"><pre><span></span><code>开发者编写：           obj.cost
+                           │
+                           ▼ (Python 点号访问拦截)
+解释器底层执行：        Class.__dict__['cost'].__get__(obj, Class)
+                           │
+                           ▼ (在 __get__ 内部偷偷补上了括号！)
+底层实际调用：          cost_function(obj) ──► 算出浮点数并返回给开发者
+</code></pre></div>
+<strong>结论</strong>：开发者之所以不需要手写括号，是因为点号访问那一瞬间，Python 已经通过描述符的 <code>__get__</code> 钩子在底层替你把括号执行完毕了。</p>
+<hr />
+<h2 id="4-python-私有变量与方法的工程哲学">4. Python 私有变量与方法的工程哲学<a class="headerlink" href="#4-python-私有变量与方法的工程哲学" title="Permanent link">&para;</a></h2>
+<h3 id="成年人法则">“成年人法则”：<a class="headerlink" href="#成年人法则" title="Permanent link">&para;</a></h3>
+<p>Python 没有像 C++/Java 那样的强制 <code>private</code> 关键字。Python 的哲学是 <strong>“We are all consenting adults here”</strong>（大家都是成年人，遵循约定与契约）。</p>
+<h3 id="单下划线-_-的全景应用">单下划线 <code>_</code> 的全景应用：<a class="headerlink" href="#单下划线-_-的全景应用" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>私有属性（<code>__init__</code> 与方法内）</strong>：如 <code>self._cost</code>、<code>self._start_time</code>，表示属于内部状态，外部不应直接读写。</li>
+<li><strong>私有类方法（辅助函数）</strong>：如 <code>_ask_confirmation_or_interrupt</code>、<code>_start_container</code>、<code>_check_finished</code>，仅供类内部方法互相调用。</li>
+<li><strong>模块级私有函数</strong>：如 <code>local.py</code> 里的 <code>_run()</code>，仅在当前文件内部执行底层进程调用，不向外导出。</li>
+</ol>
+<hr />
+<h2 id="5-tenacity-弹性重试机制与上下文管理器跃迁">5. Tenacity 弹性重试机制与上下文管理器跃迁<a class="headerlink" href="#5-tenacity-弹性重试机制与上下文管理器跃迁" title="Permanent link">&para;</a></h2>
+<p>在 <code>src/minisweagent/models/utils/retry.py</code> 中，展示了应对大模型不稳定性的工业级重试模式：</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">retry</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">abort_exceptions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Retrying</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Retrying</span><span class="p">(</span>
+        <span class="n">reraise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stop</span><span class="o">=</span><span class="n">stop_after_attempt</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"MSWEA_MODEL_RETRY_STOP_AFTER_ATTEMPT"</span><span class="p">,</span> <span class="s2">"10"</span><span class="p">))),</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_exponential</span><span class="p">(</span><span class="n">multiplier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
+        <span class="n">before_sleep</span><span class="o">=</span><span class="n">before_sleep_log</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">),</span>
+        <span class="n">retry</span><span class="o">=</span><span class="n">retry_if_not_exception_type</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">abort_exceptions</span><span class="p">)),</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>消费端（<code>litellm_model.py</code> 第 82 行）：
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="n">retry</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">abort_exceptions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">abort_exceptions</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">attempt</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="核心工程精髓">核心工程精髓：<a class="headerlink" href="#核心工程精髓" title="Permanent link">&para;</a></h3>
+<h4 id="1-为什么不用固定的-retry-装饰器而改用上下文管理器循环">1. 为什么不用固定的 <code>@retry</code> 装饰器，而改用上下文管理器循环？<a class="headerlink" href="#1-为什么不用固定的-retry-装饰器而改用上下文管理器循环" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>静态装饰器的死穴</strong>：<code>@retry</code> 在模块导入期就静态锁死了重试次数与参数，无法适配运行时动态变化。</li>
+<li><strong>动态配置绑定</strong>：改用 <code>Retrying</code> 对象配合 <code>for attempt in ... with attempt:</code>，使得重试逻辑能够在运行时动态读取环境变量 <code>MSWEA_MODEL_RETRY_STOP_AFTER_ATTEMPT</code>，并根据不同模型实例动态绑定 <code>abort_exceptions</code>。</li>
+</ul>
+<h4 id="2-指数退避exponential-backoffvs-盲目狂刷">2. 指数退避（Exponential Backoff）vs 盲目狂刷<a class="headerlink" href="#2-指数退避exponential-backoffvs-盲目狂刷" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>反模式（<code>sleep(1)</code> 狂刷）</strong>：API 报 429 过载时，短间隔死等狂刷会形成“惊群效应（Thundering Herd）/ 重试风暴”，让脆弱的服务器彻底瘫痪。</li>
+<li><strong>指数退避法则</strong>：重试间隔按 $4s \to 8s \to 16s \to 32s \to 60s$ 翻倍递增，给服务器提供充裕的冷却恢复窗口。</li>
+</ul>
+<h4 id="3-防御性拦截名单abort_exceptions与-ctrlc-死循环警示">3. 防御性拦截名单（<code>abort_exceptions</code>）与 Ctrl+C 死循环警示<a class="headerlink" href="#3-防御性拦截名单abort_exceptions与-ctrlc-死循环警示" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>并不是所有错误都值得重试</strong>：</li>
+<li>API Key 错误（401）、模型名不存在（404）、Token 超出上下文（ContextWindowExceeded）等属于确定性致命错误，重试无用，必须立即熔断中断。</li>
+<li><strong>Ctrl+C 陷阱</strong>：
+  如果名单中漏掉了 <strong><code>KeyboardInterrupt</code></strong>，当用户按下 Ctrl+C 试图终止程序时，Tenacity 会将该异常当成普通网络失败，<strong>捕获它并等待 4 秒重新发起一次大模型请求</strong>，造成程序无视人类终止指令的荒谬循环。</li>
+</ul>
+<hr />
+<h2 id="6-互动问答精要复盘">6. 互动问答精要复盘<a class="headerlink" href="#6-互动问答精要复盘" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Q1：为什么把整数包装后加括号会报 <code>TypeError: 'int' object is not callable</code>？</strong></li>
+<li><strong>解答</strong>：<code>@property</code> 将方法变成了属性。访问 <code>obj.cost</code> 已直接求值为 <code>int/float</code>；在其后面加括号相当于执行 <code>10()</code>，对非函数类型加括号必定触发该类型不可调用错误。</li>
+<li><strong>Q2：什么叫“一旦报错就 sleep(1) 狂刷”？</strong></li>
+<li><strong>解答</strong>：面对服务端 429 限流时，使用死循环每秒重试一次，未给服务器留出恢复时间，易引发重试风暴；工业界应采用 <code>wait_exponential</code> 指数退避。</li>
+<li><strong>Q3：为什么 <code>abort_exceptions</code> 必须包含 <code>KeyboardInterrupt</code>？</strong></li>
+<li><strong>解答</strong>：Tenacity 默认重试除名单外的所有异常。若不包含键盘中断，用户按 Ctrl+C 会被 Tenacity 拦截并重新发起大模型调用，导致无法打断程序。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

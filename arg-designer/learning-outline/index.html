@@ -1,0 +1,1115 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、mini-swe-agent）">
+      
+      
+      
+      
+        <link rel="prev" href="../paper-reading/">
+      
+      
+        <link rel="next" href="../../mini-swe-agent/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>学习大纲 - Agent 论文与源码学习笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#arg-designer-学习大纲论文--代码--工程语法" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-header__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Agent 论文与源码学习笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              学习大纲
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-nav__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Agent 论文与源码学习笔记
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ARG-Designer
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ARG-Designer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../paper-reading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    论文阅读笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    学习大纲
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    学习大纲
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-仓库的真实面貌先看清再学" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. 仓库的真实面貌（先看清再学）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-a宏观架构-论文主要设计--代码如何实现" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part A：宏观架构 ——「论文主要设计 → 代码如何实现」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-b细致语法与工程--每课绑定本仓库的真实代码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part B：细致语法与工程 —— 每课绑定本仓库的真实代码
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#每一课的固定流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        每一课的固定流程
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#产出物" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        产出物
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mini-swe-agent
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    mini-swe-agent
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一讲 宏观架构与控制流
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第二讲 交互状态机与 HITL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第三讲 沙箱环境与安全流控
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第四讲 装饰器与 Tenacity 重试
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第五讲 日志与轨迹序列化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第六讲 命令行配置体系
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第七讲 打包规范与沙箱部署
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/how_to_derive_agents_md_playbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    番外 AGENTS.md 五步逆向讨论法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-仓库的真实面貌先看清再学" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. 仓库的真实面貌（先看清再学）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-a宏观架构-论文主要设计--代码如何实现" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part A：宏观架构 ——「论文主要设计 → 代码如何实现」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-b细致语法与工程--每课绑定本仓库的真实代码" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part B：细致语法与工程 —— 每课绑定本仓库的真实代码
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#每一课的固定流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        每一课的固定流程
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#产出物" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        产出物
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="arg-designer-学习大纲论文--代码--工程语法">ARG-Designer 学习大纲（论文 ↔ 代码 ↔ 工程语法）<a class="headerlink" href="#arg-designer-学习大纲论文--代码--工程语法" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>论文：<em>Assemble Your Crew: Automatic Multi-agent Communication Topology Design via Autoregressive Graph Generation</em>（AAAI 2026 Oral，arXiv 2507.18224）
+目标：① 学会"带着论文读陌生仓库"的方法；② 吃透本仓库用到的工程语法；③ 沉淀一份能指导 Agent 复现本仓库的 <code>AGENTS.md</code>。</p>
+</blockquote>
+<h2 id="0-仓库的真实面貌先看清再学">0. 仓库的真实面貌（先看清再学）<a class="headerlink" href="#0-仓库的真实面貌先看清再学" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>目录</th>
+<th>作用</th>
+<th>对应论文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mas_framework/</code></td>
+<td>MAS <strong>执行层</strong>：Graph / Node / Agent / LLM / 工具（源自 GDesigner）</td>
+<td>Problem Formulation：协作图、协作协议（式 1–3）</td>
+</tr>
+<tr>
+<td><code>experiment/model.py</code></td>
+<td><strong>ARGDesigner 模型</strong>：GRU 节点生成器 + GRU 边生成器</td>
+<td>Model Architecture（式 6–15）、Algorithm 1</td>
+</tr>
+<tr>
+<td><code>experiment/&lt;数据集&gt;/cold_start_*.py</code></td>
+<td>阶段 1：生成冷启动数据 D_exp</td>
+<td>式 16</td>
+</tr>
+<tr>
+<td><code>experiment/&lt;数据集&gt;/finetune_*.py</code></td>
+<td>阶段 2：预训练 → 生成 D_eff → 微调</td>
+<td>式 17、18–21</td>
+</tr>
+<tr>
+<td><code>experiment/&lt;数据集&gt;/evaluate_*.py</code></td>
+<td>阶段 3：用训练好的模型生成拓扑并评测</td>
+<td>Inference</td>
+</tr>
+<tr>
+<td><code>experiment/args.py</code> <code>train_ARGDesigner.py</code></td>
+<td>命令行配置 / 训练循环</td>
+<td>式 19</td>
+</tr>
+</tbody>
+</table>
+<p><strong>诚实提示</strong>：仓库 <strong>没有</strong> <code>pyproject.toml</code> / <code>requirements.txt</code> / Dockerfile / shell 脚本；"打包、shell、docker"这一块我们会先看它现有的做法（<code>sys.path.append</code>、<code>.env</code>、README 里的命令），再动手补上规范版本。另外 <code>experiment/prompt</code> 与 <code>mas_framework/prompt</code> 内容重复，是代码异味，读代码时要留意。</p>
+<hr />
+<h2 id="part-a宏观架构-论文主要设计--代码如何实现">Part A：宏观架构 ——「论文主要设计 → 代码如何实现」<a class="headerlink" href="#part-a宏观架构-论文主要设计--代码如何实现" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>课</th>
+<th>主题</th>
+<th>论文对应</th>
+<th>重点代码</th>
+<th>要掌握的"读仓库方法"</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L01</strong></td>
+<td>读仓库方法论 + 三阶段流水线全景</td>
+<td>Fig.2b、Intro</td>
+<td>README、<code>cold_start_humaneval.py</code>、<code>finetune_humaneval.py</code>、<code>evaluate_humaneval.py</code></td>
+<td>从 README 命令行入口 → 画数据流（谁产出什么文件，谁消费）</td>
+</tr>
+<tr>
+<td><strong>L02</strong></td>
+<td>MAS 执行层：协作图、节点、协议</td>
+<td>式 1–3、DAG、拓扑排序、K 轮</td>
+<td><code>graph/graph.py</code>、<code>graph/node.py</code>、<code>agents/*</code>、<code>agent_registry.py</code></td>
+<td>论文里的数学符号 ↔ 类/字段（V→Node，E→spatial/temporal mask）</td>
+</tr>
+<tr>
+<td><strong>L03</strong></td>
+<td>冷启动数据 D_exp</td>
+<td>式 16、config c=('star',6,R)</td>
+<td><code>utils.get_kwargs</code>、<code>cold_start_*.py</code></td>
+<td>论文"数据构造"在代码里往往是一个循环 + 过滤条件</td>
+</tr>
+<tr>
+<td><strong>L04</strong></td>
+<td>图 → 序列：数据表示</td>
+<td>式 5 自回归分解</td>
+<td><code>process_dataset.py</code>、<code>*_adapter.py</code>、<code>Graph_to_Adj_Matrix</code></td>
+<td>模型输入张量的形状推导（max_prev_node、head_and_tail）</td>
+</tr>
+<tr>
+<td><strong>L05</strong></td>
+<td>模型结构：节点生成器</td>
+<td>式 6–11（task emb、GRU_prev、门控、metric-learning 选角色）</td>
+<td><code>ARGDesigner.__init__</code>、<code>forward</code> 前半</td>
+<td>公式逐行对照；找出论文没写的实现细节</td>
+</tr>
+<tr>
+<td><strong>L06</strong></td>
+<td>模型结构：边生成器 + 训练损失</td>
+<td>式 12–15、18–21、teacher forcing</td>
+<td><code>forward</code> 后半、<code>train_ARGDesigner.py</code></td>
+<td>论文 NLL ↔ 代码 BCE 的等价性与差异</td>
+</tr>
+<tr>
+<td><strong>L07</strong></td>
+<td>推理采样</td>
+<td>Algorithm 1</td>
+<td><code>ARGDesigner.sample</code>、<code>utils.generate_graph</code></td>
+<td>论文伪代码 ↔ 真实代码里的"修补逻辑"（保底一条边、连通修复、去环）</td>
+</tr>
+<tr>
+<td><strong>L08</strong></td>
+<td>效率微调 D_eff</td>
+<td>式 17：D_simple / D_pruned / D_replay</td>
+<td><code>finetune_*.py</code></td>
+<td>课程学习：用"数据"而非"损失"实现论文思想</td>
+</tr>
+<tr>
+<td><strong>L09</strong></td>
+<td>评测与全链路串联 + 论文 vs 代码差异清单</td>
+<td>实验章节、Ablation</td>
+<td><code>evaluate_*.py</code>、<code>ablation_variant</code></td>
+<td>复现实验的最小路径；如何判断代码是否忠于论文</td>
+</tr>
+</tbody>
+</table>
+<h2 id="part-b细致语法与工程--每课绑定本仓库的真实代码">Part B：细致语法与工程 —— 每课绑定本仓库的真实代码<a class="headerlink" href="#part-b细致语法与工程--每课绑定本仓库的真实代码" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>课</th>
+<th>主题</th>
+<th>本仓库里的例子</th>
+<th>练习</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L10</strong></td>
+<td>装饰器与注册表模式</td>
+<td><code>@LLMRegistry.register('GPTChat')</code>、<code>@classmethod</code>、<code>@staticmethod</code>、<code>@abstractmethod</code>、<code>@property</code></td>
+<td>手写一个 <code>register</code> 装饰器 + 简易注册表</td>
+</tr>
+<tr>
+<td><strong>L11</strong></td>
+<td>重试装饰器与异步</td>
+<td><code>tenacity</code> 的 <code>@retry</code>（<code>gpt_chat.py</code>）；<code>async/await</code>、<code>asyncio.gather</code>（<code>cold_start_*</code>、<code>graph.arun</code>）</td>
+<td>给一个会失败的函数加指数退避重试；并发跑 N 个协程</td>
+</tr>
+<tr>
+<td><strong>L12</strong></td>
+<td>日志</td>
+<td><code>loguru</code>（<code>utils/log.py</code>：<code>configure_logging</code>、<code>swarmlog</code>）</td>
+<td>把仓库里散落的 <code>print</code> 改造成分级日志 + 文件轮转</td>
+</tr>
+<tr>
+<td><strong>L13</strong></td>
+<td>命令行与配置</td>
+<td><code>argparse</code>（<code>experiment/args.py</code> 的 <code>Args</code> 类；各脚本 <code>parse_args</code>）、<code>parse_known_args</code></td>
+<td>对比 mini-swe-agent 的 typer；给脚本加子命令/配置文件</td>
+</tr>
+<tr>
+<td><strong>L14</strong></td>
+<td>环境配置：<code>.env</code> 与 <code>sys.path</code></td>
+<td><code>template.env</code>、<code>python-dotenv</code>、<code>sys.path.append(...)</code></td>
+<td>解释为何 <code>cd experiment/humaneval</code> 才能跑；怎么消除 hack</td>
+</tr>
+<tr>
+<td><strong>L15</strong></td>
+<td>Python 打包</td>
+<td>（仓库缺失）补 <code>pyproject.toml</code>、<code>pip install -e .</code></td>
+<td>亲手给仓库加上可安装的包结构</td>
+</tr>
+<tr>
+<td><strong>L16</strong></td>
+<td>shell 脚本 + Docker</td>
+<td>（仓库缺失）<code>run_humaneval.sh</code>、<code>Dockerfile</code></td>
+<td>一键跑三阶段；容器里跑通</td>
+</tr>
+<tr>
+<td><strong>L17</strong></td>
+<td>毕业：用 Agent.md 复现仓库</td>
+<td>全部</td>
+<td>产出 <code>AGENTS.md</code> 并试跑</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>顺序可以交错：学完 L02 后穿插 L10（注册表），学完 L03 后穿插 L11（异步），随讲随学效果更好。实际顺序以我们的进度为准。</p>
+</blockquote>
+<hr />
+<h2 id="每一课的固定流程">每一课的固定流程<a class="headerlink" href="#每一课的固定流程" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>讲解</strong>：先讲"论文怎么说"，再讲"代码怎么写"，最后讲"二者哪里不一样"。</li>
+<li><strong>提问</strong>：3–4 个问题（概念题 + 定位代码题 + 小推理题），你作答。</li>
+<li><strong>点评</strong>：我指出你答对/遗漏的点，必要时回讲。</li>
+<li><strong>落笔</strong>：生成本课笔记 <code>lessons/Lxx_*.md</code>，并把"这一课我们是怎么交流的"追加到 <code>协作思路文档.md</code>。</li>
+</ol>
+<h2 id="产出物">产出物<a class="headerlink" href="#产出物" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>learning-notes/00_学习大纲.md</code>（本文件）</li>
+<li><code>learning-notes/lessons/Lxx_*.md</code>：每课笔记</li>
+<li><code>learning-notes/协作思路文档.md</code>：我们的交流方法 → 最终提炼为 <code>AGENTS.md</code>（用于指导 Agent 生成/复现 ARG-Designer）</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

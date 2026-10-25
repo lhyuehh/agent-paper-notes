@@ -1,0 +1,1252 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、mini-swe-agent）">
+      
+      
+      
+      
+        <link rel="prev" href="../mini_swe_agent_study_notes_lecture2/">
+      
+      
+        <link rel="next" href="../mini_swe_agent_study_notes_lecture4/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>第三讲 沙箱环境与安全流控 - Agent 论文与源码学习笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mini-swe-agent-源码研读笔记第三讲沙箱环境抽象操作系统底层进程与安全流控" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-header__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Agent 论文与源码学习笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第三讲 沙箱环境与安全流控
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-nav__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Agent 论文与源码学习笔记
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ARG-Designer
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ARG-Designer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/paper-reading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    论文阅读笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/learning-outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    学习大纲
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mini-swe-agent
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    mini-swe-agent
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一讲 宏观架构与控制流
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第二讲 交互状态机与 HITL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第三讲 沙箱环境与安全流控
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第三讲 沙箱环境与安全流控
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#目录" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        目录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-environment-协议与鸭子类型设计" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Environment 协议与鸭子类型设计
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Environment 协议与鸭子类型设计">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心能力清单三大约定" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心能力清单（三大约定）：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-localenvironment-底层进程管理与孤儿进程消灭" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. LocalEnvironment 底层进程管理与孤儿进程消灭
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. LocalEnvironment 底层进程管理与孤儿进程消灭">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#进程组process-group与孤儿进程防御" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        进程组（Process Group）与孤儿进程防御：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-标准流stdoutstderr与时序合流" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 标准流（stdout/stderr）与时序合流
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 标准流（stdout/stderr）与时序合流">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#管道赋值解密" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        管道赋值解密：
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#为什么必须并联合流" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么必须并联合流？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-dockerenvironment-容器长驻与动态命令穿透" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. DockerEnvironment 容器长驻与动态命令穿透
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-环境配置序列化的科研与工程价值" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 环境配置序列化的科研与工程价值
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 环境配置序列化的科研与工程价值">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#环境配置清单environmentconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        环境配置清单（EnvironmentConfig）：
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#为什么必须保存" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么必须保存？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-互动问答精华复盘" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 互动问答精华复盘
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第四讲 装饰器与 Tenacity 重试
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第五讲 日志与轨迹序列化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第六讲 命令行配置体系
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mini_swe_agent_study_notes_lecture7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第七讲 打包规范与沙箱部署
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how_to_derive_agents_md_playbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    番外 AGENTS.md 五步逆向讨论法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#目录" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        目录
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-environment-协议与鸭子类型设计" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Environment 协议与鸭子类型设计
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Environment 协议与鸭子类型设计">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心能力清单三大约定" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心能力清单（三大约定）：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-localenvironment-底层进程管理与孤儿进程消灭" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. LocalEnvironment 底层进程管理与孤儿进程消灭
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. LocalEnvironment 底层进程管理与孤儿进程消灭">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#进程组process-group与孤儿进程防御" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        进程组（Process Group）与孤儿进程防御：
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-标准流stdoutstderr与时序合流" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 标准流（stdout/stderr）与时序合流
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 标准流（stdout/stderr）与时序合流">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#管道赋值解密" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        管道赋值解密：
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#为什么必须并联合流" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么必须并联合流？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-dockerenvironment-容器长驻与动态命令穿透" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. DockerEnvironment 容器长驻与动态命令穿透
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-环境配置序列化的科研与工程价值" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 环境配置序列化的科研与工程价值
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 环境配置序列化的科研与工程价值">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#环境配置清单environmentconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        环境配置清单（EnvironmentConfig）：
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#为什么必须保存" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么必须保存？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-互动问答精华复盘" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 互动问答精华复盘
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="mini-swe-agent-源码研读笔记第三讲沙箱环境抽象操作系统底层进程与安全流控">mini-swe-agent 源码研读笔记（第三讲：沙箱环境抽象、操作系统底层进程与安全流控）<a class="headerlink" href="#mini-swe-agent-源码研读笔记第三讲沙箱环境抽象操作系统底层进程与安全流控" title="Permanent link">&para;</a></h1>
+<h2 id="目录">目录<a class="headerlink" href="#目录" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#1-environment-协议与鸭子类型设计">Environment 协议与鸭子类型设计</a></li>
+<li><a href="#2-localenvironment-底层进程管理与孤儿进程消灭">LocalEnvironment 底层进程管理与孤儿进程消灭</a></li>
+<li><a href="#3-标准流stdoutstderr与时序合流">标准流（stdout/stderr）与时序合流</a></li>
+<li><a href="#4-dockerenvironment-容器长驻与动态命令穿透">DockerEnvironment 容器长驻与动态命令穿透</a></li>
+<li><a href="#5-环境配置序列化的科研与工程价值">环境配置序列化的科研与工程价值</a></li>
+<li><a href="#6-互动问答精华复盘">互动问答精华复盘</a></li>
+</ol>
+<hr />
+<h2 id="1-environment-协议与鸭子类型设计">1. Environment 协议与鸭子类型设计<a class="headerlink" href="#1-environment-协议与鸭子类型设计" title="Permanent link">&para;</a></h2>
+<p>在 <code>src/minisweagent/__init__.py</code> 中，定义了核心环境协议：</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Protocol</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Environment</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Protocol for execution environments."""</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Any</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_template_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span> <span class="o">...</span>
+</code></pre></div>
+<h3 id="核心能力清单三大约定">核心能力清单（三大约定）：<a class="headerlink" href="#核心能力清单三大约定" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong><code>execute(action)</code></strong>：负责在具体的沙箱里执行命令，返回包含 <code>output</code>、<code>returncode</code> 的字典。</li>
+<li><strong><code>get_template_vars()</code></strong>：汇报当前操作系统与环境变量，供 Jinja2 渲染 Prompt。</li>
+<li>
+<p><strong><code>serialize()</code></strong>：将环境运行配置打包成字典，写入 Trajectory JSON 供实验复现。</p>
+</li>
+<li>
+<p><strong>面向对象哲学（鸭子类型 Duck Typing）</strong>：
+  Agent 上层状态机（<code>DefaultAgent</code>）不需要关心底层到底是运行在 Mac、Linux、Docker 容器还是远程 K8s 集群。只要一个类具备这 3 个方法，它就是一个合法的执行环境。</p>
+</li>
+</ol>
+<hr />
+<h2 id="2-localenvironment-底层进程管理与孤儿进程消灭">2. LocalEnvironment 底层进程管理与孤儿进程消灭<a class="headerlink" href="#2-localenvironment-底层进程管理与孤儿进程消灭" title="Permanent link">&para;</a></h2>
+<p>在 <code>src/minisweagent/environments/local.py</code> 中，<code>_run()</code> 展示了工业级操作系统进程控制：</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_run</span><span class="p">(</span><span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CompletedProcess</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+        <span class="n">command</span><span class="p">,</span>
+        <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span>
+        <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
+        <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>          <span class="c1"># 👈 标准流并联</span>
+        <span class="n">start_new_session</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"posix"</span><span class="p">,</span> <span class="c1"># 👈 独立的 Process Group</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+        <span class="c1"># 👈 核心安全斩杀：按进程组一锅端！</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">killpg</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGKILL</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"posix"</span> <span class="k">else</span> <span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CompletedProcess</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">stdout</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="进程组process-group与孤儿进程防御">进程组（Process Group）与孤儿进程防御：<a class="headerlink" href="#进程组process-group与孤儿进程防御" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>普通 <code>process.kill()</code> 的死穴</strong>：仅杀死最外层的 Shell 进程，其派生的子 Python 脚本或后台任务失去父进程，沦为<strong>孤儿/僵尸进程（Orphan/Zombie Process）</strong>继续狂吃系统资源。</li>
+<li><strong><code>start_new_session=True</code></strong>：为当前命令创建独立的会话和进程组（PGID 等同于主命令 PID）。</li>
+<li><strong><code>os.killpg(process.pid, signal.SIGKILL)</code></strong>：发生 30 秒超时时，操作系统根据 PGID 户口本一次性强制终结该树状分支下的全部进程，做到零资源泄漏。</li>
+</ol>
+<hr />
+<h2 id="3-标准流stdoutstderr与时序合流">3. 标准流（stdout/stderr）与时序合流<a class="headerlink" href="#3-标准流stdoutstderr与时序合流" title="Permanent link">&para;</a></h2>
+<h3 id="管道赋值解密">管道赋值解密：<a class="headerlink" href="#管道赋值解密" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><span class="n">stdout</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+<span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+</code></pre></div>
+* <strong>左边 <code>stdout=</code> / <code>stderr=</code></strong>：子进程两个待连接的插座（1 号正常麦克风与 2 号报警大喇叭）。
+* <strong>右边 <code>subprocess.PIPE</code></strong>：建立内存管道，将输出引流到 Python 代码变量中。
+* <strong>右边 <code>subprocess.STDOUT</code></strong>：特殊的重定向转接头，强制将 2 号错误管道接入 1 号正常管道（等价于 Shell 中的 <code>2&gt;&amp;1</code>）。</p>
+<h3 id="为什么必须并联合流">为什么必须并联合流？<a class="headerlink" href="#为什么必须并联合流" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>防止报错丢失</strong>：若不写 <code>stderr=STDOUT</code>，报错信息留存于独立的错误流中，Python 拿到的 <code>stdout</code> 为空，导致大模型无法获知错误原因。</li>
+<li><strong>保留案发现场时序</strong>：若分别接两根管道（<code>stdout=PIPE, stderr=PIPE</code>），正常输出与报错信息被分割成两段文本，先后时间顺序断裂；合流后完美还原真实终端中滚动输出的完整时序。</li>
+<li><strong>成败判定标准</strong>：报错合流并不会掩盖错误，进程的成败由操作系统的 <strong><code>returncode</code>（退出码）</strong> 严格裁决（<code>0</code> 成功，非 <code>0</code> 失败）。</li>
+</ol>
+<hr />
+<h2 id="4-dockerenvironment-容器长驻与动态命令穿透">4. DockerEnvironment 容器长驻与动态命令穿透<a class="headerlink" href="#4-dockerenvironment-容器长驻与动态命令穿透" title="Permanent link">&para;</a></h2>
+<p>在 <code>src/minisweagent/environments/docker.py</code> 中，展示了安全隔离的容器生命周期管理：</p>
+<ol>
+<li><strong><code>sleep</code> 占位长驻</strong>：
+   <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>minisweagent-xxx<span class="w"> </span>&lt;image&gt;<span class="w"> </span>sleep<span class="w"> </span>2h
+</code></pre></div>
+   通过启动 2 小时的 <code>sleep</code> 守护进程，使沙箱容器常驻后台，充当干净隔离的临时虚拟工作区。</li>
+<li><strong><code>docker exec</code> 穿透执行</strong>：
+   每次大模型发出命令，通过 <code>docker exec -w &lt;cwd&gt; -e &lt;env&gt; &lt;container_id&gt; bash -lc "&lt;command&gt;"</code> 动态穿透进容器执行，命令产生的文件在容器内部自然持久化。</li>
+<li><strong>析构函数 <code>__del__</code> 自动回收</strong>：
+   当 Python 程序结束或环境对象被 GC 垃圾回收时，自动触发后台清理命令：
+   <div class="highlight"><pre><span></span><code><span class="o">(</span>timeout<span class="w"> </span><span class="m">60</span><span class="w"> </span>docker<span class="w"> </span>stop<span class="w"> </span>&lt;id&gt;<span class="w"> </span><span class="o">||</span><span class="w"> </span>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>&lt;id&gt;<span class="o">)</span><span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span>
+</code></pre></div>
+   采用双保险机制确保容器在后台彻底销毁，绝不占用宿主机端口或内存。</li>
+</ol>
+<hr />
+<h2 id="5-环境配置序列化的科研与工程价值">5. 环境配置序列化的科研与工程价值<a class="headerlink" href="#5-环境配置序列化的科研与工程价值" title="Permanent link">&para;</a></h2>
+<h3 id="环境配置清单environmentconfig">环境配置清单（<code>EnvironmentConfig</code>）：<a class="headerlink" href="#环境配置清单environmentconfig" title="Permanent link">&para;</a></h3>
+<p>包含 <code>image</code> 镜像名、工作目录 <code>cwd</code>、超时时间 <code>timeout</code>、环境变量 <code>env</code> 等。</p>
+<h3 id="为什么必须保存">为什么必须保存？<a class="headerlink" href="#为什么必须保存" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>科学评测的可复现性（Determinism）</strong>：代码改动需要与特定依赖环境绑定。保存环境配置确保 3 个月后在另一台机器上拉取相同 Docker 镜像时，能够 100% 还原当时的测试现场。</li>
+<li><strong>跨平台解耦</strong>：避免在上层业务中硬编码系统特性（如 Mac 的 <code>sed -i ''</code> 与 Linux 的 <code>sed -i</code>），由环境自报家门注入模板。</li>
+<li><strong>自包含轨迹档案（Self-contained Trajectory）</strong>：生成的 JSON 记录同时包含模型信息、步数开销与宿主环境全貌。</li>
+</ol>
+<hr />
+<h2 id="6-互动问答精华复盘">6. 互动问答精华复盘<a class="headerlink" href="#6-互动问答精华复盘" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Q1：如果不写 <code>stderr=subprocess.STDOUT</code> 会怎样？</strong></li>
+<li><strong>解答</strong>：报错信息留在单独的 stderr 流中，Python 变量只拿到空输出，导致大模型无法获得真实报错以进行自我纠错。</li>
+<li><strong>Q2：既然报错都混进了 <code>stdout</code>，Agent 如何判定命令成败？</strong></li>
+<li><strong>解答</strong>：依靠操作系统的数字退出码 <strong><code>returncode</code></strong>（0 为成功，非 0 为失败）。</li>
+<li><strong>Q3：为什么不能单靠 <code>process.kill()</code> 处理超时？</strong></li>
+<li><strong>解答</strong>：单靠 <code>process.kill()</code> 会遗留孤儿/僵尸后台进程；必须通过 <code>start_new_session=True</code> 配合 <code>os.killpg</code> 按进程组彻底诛杀。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
