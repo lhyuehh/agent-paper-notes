@@ -1,0 +1,46 @@
+site_name: Agent 论文与源码学习笔记
+site_description: 多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、mini-swe-agent）
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify {kwds: {case: lower}}
+  - pymdownx.arithmatex:
+      generic: true
+      inline_syntax: ['round']
+      block_syntax: ['square']
+  - pymdownx.superfences:
+      custom_fences:
+        - name: math
+          class: arithmatex
+          format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format {kwds: {mode: generic}}
+  - pymdownx.tasklist:
+      custom_checkbox: true
+hooks:
+  - hooks/math.py
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+nav:
+  - 首页: index.md
+  - ARG-Designer:
+      - 论文阅读笔记: arg-designer/paper-reading.md
+      - 学习大纲: arg-designer/learning-outline.md
+  - mini-swe-agent:
+      - 概览: mini-swe-agent/index.md
+      - 第一讲 宏观架构与控制流: mini-swe-agent/mini_swe_agent_study_notes_lecture1.md
+      - 第二讲 交互状态机与 HITL: mini-swe-agent/mini_swe_agent_study_notes_lecture2.md
+      - 第三讲 沙箱环境与安全流控: mini-swe-agent/mini_swe_agent_study_notes_lecture3.md
+      - 第四讲 装饰器与 Tenacity 重试: mini-swe-agent/mini_swe_agent_study_notes_lecture4.md
+      - 第五讲 日志与轨迹序列化: mini-swe-agent/mini_swe_agent_study_notes_lecture5.md
+      - 第六讲 命令行配置体系: mini-swe-agent/mini_swe_agent_study_notes_lecture6.md
+      - 第七讲 打包规范与沙箱部署: mini-swe-agent/mini_swe_agent_study_notes_lecture7.md
+      - 番外 AGENTS.md 五步逆向讨论法: mini-swe-agent/how_to_derive_agents_md_playbook.md
