@@ -35,9 +35,11 @@ extra_javascript:
 nav:
   - 首页: index.md
   - ARG-Designer:
+      - 概览: arg-designer/index.md
       - 论文阅读笔记: arg-designer/paper-reading.md
       - 学习大纲: arg-designer/learning-outline.md
   - MASkills:
+      - 概览: maskills/index.md
       - 论文阅读笔记: maskills/paper-reading.md
   - mini-swe-agent:
       - 概览: mini-swe-agent/index.md
