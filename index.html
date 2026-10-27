@@ -12,7 +12,7 @@
       
       
       
-        <link rel="next" href="arg-designer/paper-reading/">
+        <link rel="next" href="arg-designer/">
       
       
         
@@ -205,24 +205,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    首页
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="." class="md-nav__link md-nav__link--active">
         
   
@@ -239,58 +221,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#arg-designer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ARG-Designer
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#maskills" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MASkills
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mini-swe-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        mini-swe-agent
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -349,6 +279,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="arg-designer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -466,6 +424,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="maskills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -835,47 +821,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#arg-designer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ARG-Designer
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#maskills" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MASkills
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mini-swe-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        mini-swe-agent
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -893,23 +838,33 @@
 
 <h1 id="agent-论文与源码学习笔记">Agent 论文与源码学习笔记<a class="headerlink" href="#agent-论文与源码学习笔记" title="Permanent link">&para;</a></h1>
 <p>读 Agent / 多智能体方向的论文和开源仓库时留下的笔记，重点是"<strong>论文描述 ↔ 代码实现</strong>"怎么对上。</p>
-<h2 id="arg-designer">ARG-Designer<a class="headerlink" href="#arg-designer" title="Permanent link">&para;</a></h2>
-<p>论文 <a href="https://arxiv.org/abs/2507.18224"><em>Assemble Your Crew</em></a>（AAAI 2026 Oral）与官方仓库 <a href="https://github.com/Shiy-Li/ARG-Designer">Shiy-Li/ARG-Designer</a>。</p>
-<ul>
-<li><a href="arg-designer/paper-reading/">论文阅读笔记</a>：按"读的时候提的问题"组织，配原论文插图，含论文 vs 代码差异清单。</li>
-<li><a href="arg-designer/learning-outline/">学习大纲</a>：论文设计 ↔ 代码实现，以及工程语法的学习路线。</li>
-</ul>
-<h2 id="maskills">MASkills<a class="headerlink" href="#maskills" title="Permanent link">&para;</a></h2>
-<p>论文 <a href="https://arxiv.org/abs/2609.02094"><em>MASkills: Continual Skills Optimization for Multi-Agent LLM Systems</em></a> 与官方仓库 <a href="https://github.com/DaRL-GenAI/MASkills">DaRL-GenAI/MASkills</a>。</p>
-<ul>
-<li><a href="maskills/paper-reading/">论文阅读笔记</a>：先给全局流水线和一轮迭代的流程图，再用一个任务走完整个流程，单独讲了"残差"，最后给出论文符号 ↔ 代码位置对照。</li>
-</ul>
-<h2 id="mini-swe-agent">mini-swe-agent<a class="headerlink" href="#mini-swe-agent" title="Permanent link">&para;</a></h2>
-<p>开源仓库 <a href="https://github.com/SWE-agent/mini-swe-agent">SWE-agent/mini-swe-agent</a> 的源码研读笔记，共七讲加一篇番外。见 <a href="mini-swe-agent/">概览</a>。</p>
-<hr />
-<blockquote>
-<p>ARG-Designer 论文插图来自原论文（CC BY 4.0），版权属原作者。</p>
-</blockquote>
+<p>每个仓库一个独立的栏目，栏目里有一个概览页和该仓库对应的全部笔记，新读的仓库按同样结构往后加。</p>
+<table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>内容</th>
+<th>笔记</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/Shiy-Li/ARG-Designer">ARG-Designer</a></td>
+<td>论文 <em>Assemble Your Crew</em>（AAAI 2026 Oral）</td>
+<td><a href="arg-designer/">概览</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/DaRL-GenAI/MASkills">MASkills</a></td>
+<td>论文 <em>MASkills: Continual Skills Optimization for Multi-Agent LLM Systems</em></td>
+<td><a href="maskills/">概览</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/SWE-agent/mini-swe-agent">mini-swe-agent</a></td>
+<td>源码研读，共七讲加一篇番外</td>
+<td><a href="mini-swe-agent/">概览</a></td>
+</tr>
+</tbody>
+</table>
 
 
 
