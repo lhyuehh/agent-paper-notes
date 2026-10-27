@@ -1,0 +1,2158 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、MASkills、mini-swe-agent）">
+      
+      
+      
+      
+        <link rel="prev" href="../../arg-designer/learning-outline/">
+      
+      
+        <link rel="next" href="../../mini-swe-agent/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>论文阅读笔记 - Agent 论文与源码学习笔记</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#maskills-阅读笔记一轮训练是怎么跑起来的" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-header__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Agent 论文与源码学习笔记
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              论文阅读笔记
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Agent 论文与源码学习笔记" class="md-nav__button md-logo" aria-label="Agent 论文与源码学习笔记" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Agent 论文与源码学习笔记
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ARG-Designer
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ARG-Designer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/paper-reading/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    论文阅读笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arg-designer/learning-outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    学习大纲
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MASkills
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MASkills
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    论文阅读笔记
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    论文阅读笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-它要解决什么" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. 它要解决什么
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-总流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 总流程
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 总流程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#10-全局流水线从配置文件到产出" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0 全局流水线（从配置文件到产出）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-一轮迭代" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 一轮迭代
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-三个循环层次" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 三个循环层次
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-完整案例一个任务走完一轮" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 完整案例：一个任务走完一轮
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 完整案例：一个任务走完一轮">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#步骤-1rollout产生轨迹" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 1：Rollout，产生轨迹
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-2记录技能轨迹-skill_trace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 2：记录技能轨迹 skill_trace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-3critic-批改一条轨迹一次调用" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 3：Critic 批改，一条轨迹一次调用
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-4聚合跨-500-条轨迹" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 4：聚合（跨 500 条轨迹）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-5算子改库" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 5：算子改库
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-6验证门" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 6：验证门
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-各阶段的细节" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 各阶段的细节
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 各阶段的细节">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-处理单位" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 处理单位
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-批改到聚合" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 批改到聚合
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-四个算子" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 四个算子
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-验证门" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 验证门
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-拓扑与-agent-之间的通信" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 拓扑与 agent 之间的通信
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-残差residual详解" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 残差（residual）详解
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 残差（residual）详解">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-它回答什么问题" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 它回答什么问题
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-它长什么样" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 它长什么样
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-从产生到被使用的完整路径" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 从产生到被使用的完整路径
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-一个小案例残差如何催生新技能" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 一个小案例：残差如何催生新技能
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-几个容易误解的点" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 几个容易误解的点
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-论文符号--代码位置" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 论文符号 ↔ 代码位置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-实验结果" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 实验结果
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mini-swe-agent
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    mini-swe-agent
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第一讲 宏观架构与控制流
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第二讲 交互状态机与 HITL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第三讲 沙箱环境与安全流控
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第四讲 装饰器与 Tenacity 重试
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第五讲 日志与轨迹序列化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第六讲 命令行配置体系
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/mini_swe_agent_study_notes_lecture7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第七讲 打包规范与沙箱部署
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mini-swe-agent/how_to_derive_agents_md_playbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    番外 AGENTS.md 五步逆向讨论法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-它要解决什么" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. 它要解决什么
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-总流程" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 总流程
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 总流程">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#10-全局流水线从配置文件到产出" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.0 全局流水线（从配置文件到产出）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-一轮迭代" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 一轮迭代
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-三个循环层次" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 三个循环层次
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-完整案例一个任务走完一轮" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 完整案例：一个任务走完一轮
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 完整案例：一个任务走完一轮">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#步骤-1rollout产生轨迹" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 1：Rollout，产生轨迹
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-2记录技能轨迹-skill_trace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 2：记录技能轨迹 skill_trace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-3critic-批改一条轨迹一次调用" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 3：Critic 批改，一条轨迹一次调用
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-4聚合跨-500-条轨迹" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 4：聚合（跨 500 条轨迹）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-5算子改库" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 5：算子改库
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#步骤-6验证门" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 6：验证门
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-各阶段的细节" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 各阶段的细节
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 各阶段的细节">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-处理单位" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 处理单位
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-批改到聚合" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 批改到聚合
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-四个算子" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 四个算子
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-验证门" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 验证门
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-拓扑与-agent-之间的通信" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 拓扑与 agent 之间的通信
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-残差residual详解" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 残差（residual）详解
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 残差（residual）详解">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-它回答什么问题" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 它回答什么问题
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-它长什么样" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 它长什么样
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-从产生到被使用的完整路径" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 从产生到被使用的完整路径
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-一个小案例残差如何催生新技能" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 一个小案例：残差如何催生新技能
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-几个容易误解的点" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 几个容易误解的点
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-论文符号--代码位置" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 论文符号 ↔ 代码位置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-实验结果" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 实验结果
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="maskills-阅读笔记一轮训练是怎么跑起来的">MASkills 阅读笔记：一轮训练是怎么跑起来的<a class="headerlink" href="#maskills-阅读笔记一轮训练是怎么跑起来的" title="Permanent link">&para;</a></h1>
+<p>论文：<em>MASkills: Continual Skills Optimization for Multi-Agent LLM Systems</em>（arXiv 2609.02094）
+代码：<a href="https://github.com/DaRL-GenAI/MASkills">DaRL-GenAI/MASkills</a>（本文提到的路径均相对于仓库内的 <code>maskills/</code> 包）</p>
+<blockquote>
+<p>阅读指引：先看第 1 节的总流程图，再看第 2 节的完整案例，最后用第 3 节的表格去代码里定位。案例里的任务、文本和分数是为说明流程<strong>构造</strong>的，字段名和流程来自真实代码。</p>
+</blockquote>
+<hr />
+<h2 id="0-它要解决什么">0. 它要解决什么<a class="headerlink" href="#0-它要解决什么" title="Permanent link">&para;</a></h2>
+<p>多 agent 系统想从经验中持续学习。常见做法是把学到的东西都写进一个系统提示词，每次更新整体改写。问题是：改一处可能破坏别处，也没法单独评估、撤销某一条知识。</p>
+<p>MASkills 的做法：把知识拆成<strong>技能库</strong>，每个技能是一个独立的 <code>SKILL.md</code> 文本文件；训练只改技能库，不改模型参数，也不改拓扑。</p>
+<p>一条技能长这样（真实格式，内容为举例）：</p>
+<div class="highlight"><pre><span></span><code>---
+name: answer-short
+description: Final answer must be the shortest faithful form
+skill_id: answer-short
+provenance: induced
+utility: 0.12
+<span class="gu">invocations: 7</span>
+<span class="gu">---</span>
+Output only the entity name or short phrase. No explanation.
+</code></pre></div>
+<p>三个关键词先记住：</p>
+<table>
+<thead>
+<tr>
+<th>词</th>
+<th>在这里的意思</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>轨迹</td>
+<td>一个任务从问题到答案的全过程记录，附带一个团队共享的 reward</td>
+</tr>
+<tr>
+<td>信用</td>
+<td>强模型 critic 对"某个技能在这条轨迹里有没有帮上忙"写的评语</td>
+</tr>
+<tr>
+<td>梯度</td>
+<td>不是求导，是 LLM 写的一段"这个技能该怎么改"的文字</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="1-总流程">1. 总流程<a class="headerlink" href="#1-总流程" title="Permanent link">&para;</a></h2>
+<h3 id="10-全局流水线从配置文件到产出">1.0 全局流水线（从配置文件到产出）<a class="headerlink" href="#10-全局流水线从配置文件到产出" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    CFG["配置 JSON&lt;br/&gt;环境 / 拓扑 / agent 数 / 轮数 / 模型"] --&gt; ENV["make_env&lt;br/&gt;按名字创建环境并切分数据"]
+    ENV --&gt; SPLIT["训练集 / 验证集 / 测试集&lt;br/&gt;启动时一次性切好, 之后固定"]
+    CFG --&gt; BUILD["组装三个部件"]
+    BUILD --&gt; CR["Critic&lt;br/&gt;批改轨迹"]
+    BUILD --&gt; OP["Optimizer&lt;br/&gt;聚合与四个算子"]
+    BUILD --&gt; TR["Trainer&lt;br/&gt;控制循环与验证门"]
+    SPLIT --&gt; BASE["第 0 轮: 空技能库在测试集上打基线"]
+    TR --&gt; BASE
+    BASE --&gt; LOOP["第 1 .. N 轮&lt;br/&gt;每轮一次 train_one_iteration"]
+    LOOP --&gt; SAVE["每轮存档&lt;br/&gt;检查点 / 导出 SKILL.md / 验证与测试指标"]
+    SAVE --&gt;|"未到 N 轮"| LOOP
+    SAVE --&gt;|"到 N 轮"| OUT["产出&lt;br/&gt;技能库目录 + 训练曲线"]
+    subgraph LLMS["用到的两类模型"]
+        M1["任务 agent&lt;br/&gt;便宜模型, 如 gpt-4o-mini&lt;br/&gt;只在 rollout 和验证时调用"]
+        M2["Critic 与 Optimizer&lt;br/&gt;强模型, 如 gpt-5.1&lt;br/&gt;只在训练时调用"]
+    end</code></pre>
+<p>读这张图的要点：</p>
+<ul>
+<li><strong>产出物只有一样东西</strong>：训练好的技能库（<code>skills_autogen/iter_&lt;i&gt;/&lt;agent&gt;/&lt;skill_id&gt;/SKILL.md</code>）。部署时只需要任务 agent 加这个库，Critic 和 Optimizer 不再需要。</li>
+<li>一次 <code>train_one_iteration</code> 就是下面 1.1 的那张图；全局流水线只是把它重复 N 次，前后加上"基线"和"存档"。</li>
+<li>想用命令行跑：<code>python scripts/demo.py</code>，或 <code>maskills train --config configs/language_task/qa_hotpot_decentralized.json</code>。</li>
+</ul>
+<h3 id="11-一轮迭代">1.1 一轮迭代<a class="headerlink" href="#11-一轮迭代" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    A["当前策略&lt;br/&gt;每个 agent = 角色说明 + 技能库"] --&gt; B["Rollout&lt;br/&gt;并行跑一批训练任务"]
+    B --&gt; C["轨迹&lt;br/&gt;每步输出 + reward + skill_trace"]
+    C --&gt; D["Critic LLM&lt;br/&gt;每条轨迹调用 1 次"]
+    C --&gt; H["困难样本&lt;br/&gt;reward ≤ 0.5"]
+    D --&gt; E1["SkillCredit&lt;br/&gt;每个 agent-技能 一份"]
+    D --&gt; E2["ResidualCredit&lt;br/&gt;每个 agent 一份"]
+    E1 --&gt; F1["聚合 → SkillGradient&lt;br/&gt;每个 agent-技能 一份"]
+    E2 --&gt; F2["聚合 → residual_summary&lt;br/&gt;每个 agent 一份"]
+    F1 --&gt; O1["Refine 精修"]
+    F1 --&gt; O2["Consolidate 合并"]
+    F1 --&gt; O3["Prune 剪枝"]
+    F2 --&gt; O4["Induct 归纳"]
+    H --&gt; O4
+    O1 --&gt; K["候选技能库 K'"]
+    O2 --&gt; K
+    O3 --&gt; K
+    O4 --&gt; K
+    K --&gt; G{"验证门&lt;br/&gt;在验证集上比较"}
+    G --&gt;|"不比旧库差超过 δ"| ACC["采纳 K'"]
+    G --&gt;|"变差"| RB["回滚到旧库 K"]
+    ACC --&gt; A
+    RB --&gt; A</code></pre>
+<p>要点：</p>
+<ul>
+<li>技能线（青色流向 Refine / Consolidate / Prune）和残差线（流向 Induct）是<strong>并行</strong>的两条路：前者处理"已有技能怎么改"，后者处理"缺了什么技能"。</li>
+<li>验证门是闭环的出口：不管采纳还是回滚，下一轮都从"当前策略"重新开始。</li>
+</ul>
+<h3 id="12-三个循环层次">1.2 三个循环层次<a class="headerlink" href="#12-三个循环层次" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart LR
+    subgraph L1["训练全过程"]
+        direction LR
+        S0["第 0 轮&lt;br/&gt;空技能库在测试集打基线"] --&gt; S1["第 1 轮"] --&gt; S2["第 2 轮"] --&gt; S3["第 N 轮"]
+    end
+    subgraph L2["每一轮内部"]
+        direction LR
+        T1["跑 500 个训练任务"] --&gt; T2["批改 500 次"] --&gt; T3["聚合与算子"] --&gt; T4["验证门"]
+    end</code></pre>
+<ul>
+<li>数据在启动时一次性切成<strong>训练 / 验证 / 测试</strong>三块，互不重叠，之后固定不变。HotpotQA 配置：训练 500、验证 200、测试 800，共 5 轮。</li>
+<li><strong>每一轮用同一批训练题、同一批验证题</strong>，只是技能库不同。测试集只用于报告，不参与任何决策。</li>
+</ul>
+<hr />
+<h2 id="2-完整案例一个任务走完一轮">2. 完整案例：一个任务走完一轮<a class="headerlink" href="#2-完整案例一个任务走完一轮" title="Permanent link">&para;</a></h2>
+<p>设定：HotpotQA，两个 agent，<code>decentralized</code> 拓扑。此时 <code>agent_2</code> 的库里已有一个技能 <code>answer-short</code>，<code>agent_1</code> 的库是空的。</p>
+<h3 id="步骤-1rollout产生轨迹">步骤 1：Rollout，产生轨迹<a class="headerlink" href="#步骤-1rollout产生轨迹" title="Permanent link">&para;</a></h3>
+<p>任务 <code>t_042</code>：问题"某书作者就读的大学在哪个城市？"，标准答案 <code>Paris</code>。</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant Env as 环境
+    participant A1 as agent_1
+    participant A2 as agent_2
+    Env-&gt;&gt;A1: 任务 = 问题 + 候选段落
+    A1--&gt;&gt;Env: 作者就读于索邦大学，位于巴黎。
+    Env-&gt;&gt;A2: 任务 + "Agent 1's Response: ..."&lt;br/&gt;+ "Now provide your FINAL answer:"
+    A2--&gt;&gt;Env: The answer is Paris, which is the capital of France.
+    Env-&gt;&gt;Env: 答案与标准答案算 token-F1，得 reward</code></pre>
+<p>reward 的计算（纯 Python，不调 LLM）：答案规范化后有 8 个词，只有 <code>paris</code> 命中，所以精确率为 <span class="arithmatex">\(\frac{1}{8}\)</span>，召回率为 <span class="arithmatex">\(1\)</span>，</p>
+<div class="arithmatex">\[
+F1=\frac{2\times 0.125\times 1}{0.125+1}\approx 0.22
+\]</div>
+<p>答案对了，但因为啰嗦分数很低。这是 HotpotQA 这类任务的特点：F1 对多余的词扣分。</p>
+<h3 id="步骤-2记录技能轨迹-skill_trace">步骤 2：记录技能轨迹 skill_trace<a class="headerlink" href="#步骤-2记录技能轨迹-skill_trace" title="Permanent link">&para;</a></h3>
+<p>环境对每一步，在该 agent 的输出里用正则查找它库里各技能的 <code>name</code> 或 <code>skill_id</code>；<strong>一个都没找到时，把库里全部技能都算作被调用</strong>。</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"agent_1"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">"step"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">[]}],</span>
+<span class="w"> </span><span class="nt">"agent_2"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">"step"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"answer-short"</span><span class="p">]}]}</span>
+</code></pre></div>
+<p><code>agent_2</code> 的输出里没出现技能名，所以走了"全部算作被调用"的分支。<code>agent_1</code> 库为空，列表为空。</p>
+<h3 id="步骤-3critic-批改一条轨迹一次调用">步骤 3：Critic 批改，一条轨迹一次调用<a class="headerlink" href="#步骤-3critic-批改一条轨迹一次调用" title="Permanent link">&para;</a></h3>
+<p>critic 收到的是一大段文本：候选段落、问题、标准答案、每个 agent 的<strong>完整系统提示词和输出</strong>、最终得分，再加上"被调用的技能"清单（每个技能的 id、描述、正文前 800 字）。它被要求输出如下 JSON：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w"> </span><span class="nt">"skills"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="nt">"agent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agent_2"</span><span class="p">,</span><span class="w"> </span><span class="nt">"skill_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"answer-short"</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">"contribution"</span><span class="p">:</span><span class="w"> </span><span class="s2">"neutral"</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">"evidence"</span><span class="p">:</span><span class="w"> </span><span class="s2">"答案是 'The answer is Paris, which is the capital of France.'，F1 仅 0.22"</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">"suggested_edit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"明确禁止以 'The answer is' 开头，并禁止补充解释"</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">"redundant_with"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="nt">"conflict_with"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">   </span><span class="nt">"utility_delta"</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.3</span><span class="p">}</span>
+<span class="w"> </span><span class="p">],</span>
+<span class="w"> </span><span class="nt">"residual"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"agent_1"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"summary"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nt">"needs_new_skill"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"missing_capability"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"agent_2"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"summary"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nt">"needs_new_skill"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"missing_capability"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">}</span>
+<span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>skills</code> 里每一项是一个"（agent，技能）对"的评语，叫 <strong>SkillCredit</strong>。</li>
+<li><code>residual</code> 里每个 agent 一项，叫 <strong>ResidualCredit</strong>，用来记录"不归任何已有技能的问题"。它是文字加布尔，<strong>没有分数</strong>。本例里两个 agent 都没有残差问题，所以都是空的；什么时候会有内容、之后怎么用，见第 4 节。</li>
+</ul>
+<h3 id="步骤-4聚合跨-500-条轨迹">步骤 4：聚合（跨 500 条轨迹）<a class="headerlink" href="#步骤-4聚合跨-500-条轨迹" title="Permanent link">&para;</a></h3>
+<p>设 500 条轨迹里，<code>answer-short</code> 一共收到 37 份评语，其中 20 份指出"答案带引导语"。聚合分两种情况：</p>
+<ul>
+<li>评语只有 1 份：不调 LLM，按一张对照表直接转换。</li>
+<li>评语 ≥ 2 份：调一次聚合 LLM，要求"合并重复模式、化解矛盾、按出现频率加权"。</li>
+</ul>
+<p>得到该技能的 <strong>SkillGradient</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"verdict"</span><span class="p">:</span><span class="w"> </span><span class="s2">"refine"</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">"summary"</span><span class="p">:</span><span class="w"> </span><span class="s2">"37 条中 20 条因加入引导语或解释导致 F1 下降"</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">"suggested_edit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"加入：禁止 'The answer is' 等引导语，只输出实体名或年份"</span><span class="p">,</span>
+<span class="w"> </span><span class="nt">"utility_score"</span><span class="p">:</span><span class="w"> </span><span class="mf">-0.2</span><span class="p">}</span>
+</code></pre></div>
+<p>残差线的聚合不调 LLM：把所有 <code>needs_new_skill=true</code> 的 <code>summary</code> 去重后拼接成一行文字（最多 5 条），得到该 agent 的 <code>residual_summary</code>。</p>
+<p>同时，reward ≤ 0.5 的轨迹被收集成"困难样本"，每条对每个 agent 记一条证据，如 <code>reward=0.22; residual=...</code>。</p>
+<h3 id="步骤-5算子改库">步骤 5：算子改库<a class="headerlink" href="#步骤-5算子改库" title="Permanent link">&para;</a></h3>
+<p><code>verdict</code> 是 <code>refine</code>，所以交给 Refine。LLM 被要求只输出<strong>编辑指令列表</strong>（不允许整体重写）：</p>
+<div class="highlight"><pre><span></span><code><span class="p">[{</span><span class="nt">"op"</span><span class="p">:</span><span class="w"> </span><span class="s2">"insert_after"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"anchor"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Output only the entity name or short phrase."</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"old"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"new"</span><span class="p">:</span><span class="w"> </span><span class="s2">" Never start with 'The answer is'. Never add explanations."</span><span class="p">}]</span>
+</code></pre></div>
+<p>Python 在技能正文里找到 <code>anchor</code>，按指令改写。改完后技能变成：</p>
+<div class="highlight"><pre><span></span><code>Output only the entity name or short phrase. Never start with 'The answer is'.
+Never add explanations. No explanation.
+</code></pre></div>
+<p>这个新版本是<strong>候选库 K'</strong>，还没生效。</p>
+<h3 id="步骤-6验证门">步骤 6：验证门<a class="headerlink" href="#步骤-6验证门" title="Permanent link">&para;</a></h3>
+<p>在固定的 200 道验证题上，用团队跑两遍，算平均 F1：</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>做法</th>
+<th>假设分数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>旧策略</td>
+<td>两个 agent 都用旧库</td>
+<td><span class="arithmatex">\(0.52\)</span></td>
+</tr>
+<tr>
+<td>仅 agent_2 换新库</td>
+<td>agent_1 保持旧库</td>
+<td><span class="arithmatex">\(0.58\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>判定：<span class="arithmatex">\(0.58\geq 0.52-0.02\)</span>，<strong>采纳</strong>。<code>agent_1</code> 的库没有变化，直接视为采纳，不用再跑。若新分数低于 <span class="arithmatex">\(0.50\)</span>，则 agent_2 的库回滚到旧版本。</p>
+<p>下一轮开始时，agent_2 用的就是新版 <code>answer-short</code>。</p>
+<hr />
+<h2 id="3-各阶段的细节">3. 各阶段的细节<a class="headerlink" href="#3-各阶段的细节" title="Permanent link">&para;</a></h2>
+<h3 id="31-处理单位">3.1 处理单位<a class="headerlink" href="#31-处理单位" title="Permanent link">&para;</a></h3>
+<p>读流程时最容易混的是"这一步是按什么单位处理的"：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>处理单位</th>
+<th>是否调 LLM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reward</td>
+<td>整条轨迹（团队共享一个数）</td>
+<td>否</td>
+</tr>
+<tr>
+<td>skill_trace</td>
+<td>（agent，步）→ 技能列表</td>
+<td>否</td>
+</tr>
+<tr>
+<td>Critic 批改</td>
+<td>轨迹（一条一次调用）</td>
+<td>是</td>
+</tr>
+<tr>
+<td>SkillCredit</td>
+<td>（agent，技能）</td>
+<td>来自 critic</td>
+</tr>
+<tr>
+<td>ResidualCredit</td>
+<td>agent</td>
+<td>来自 critic</td>
+</tr>
+<tr>
+<td>技能聚合</td>
+<td>（agent，技能），跨所有轨迹</td>
+<td>评语 ≥ 2 条才调</td>
+</tr>
+<tr>
+<td>残差聚合</td>
+<td>agent，跨所有轨迹</td>
+<td>否</td>
+</tr>
+<tr>
+<td>Refine / Prune</td>
+<td>（agent，技能）</td>
+<td>Refine 调，Prune 不调</td>
+</tr>
+<tr>
+<td>Consolidate</td>
+<td>agent 内部一组技能</td>
+<td>是</td>
+</tr>
+<tr>
+<td>Induct</td>
+<td>agent（每次至多新增 1 个）</td>
+<td>是</td>
+</tr>
+<tr>
+<td>验证门</td>
+<td>agent 的<strong>整个技能库</strong></td>
+<td>否（要跑验证集）</td>
+</tr>
+</tbody>
+</table>
+<p>每个 agent 有<strong>自己独立</strong>的技能库，两个 agent 里同名的技能也是两个技能。</p>
+<h3 id="32-批改到聚合">3.2 批改到聚合<a class="headerlink" href="#32-批改到聚合" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    T["轨迹&lt;br/&gt;单位: 一个任务"] --&gt; C["Critic LLM&lt;br/&gt;1 次调用 / 条"]
+    C --&gt; SC["SkillCredit&lt;br/&gt;单位: agent-技能"]
+    C --&gt; RC["ResidualCredit&lt;br/&gt;单位: agent"]
+    SC --&gt; SG["SkillGradient&lt;br/&gt;跨轨迹合并, 每个 agent-技能 一份"]
+    RC --&gt; RS["residual_summary&lt;br/&gt;跨轨迹合并, 不调 LLM"]
+    T --&gt; HC["困难样本&lt;br/&gt;reward ≤ 0.5, 每个 agent 一条"]</code></pre>
+<h3 id="33-四个算子">3.3 四个算子<a class="headerlink" href="#33-四个算子" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>算子</th>
+<th>做什么</th>
+<th>输入</th>
+<th>LLM 的输出</th>
+<th>触发（默认）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Refine 精修</td>
+<td>改已有技能的几句话</td>
+<td>技能正文 + SkillGradient（verdict 为 refine）</td>
+<td>编辑指令列表 <code>{op, anchor, old, new}</code></td>
+<td>每轮</td>
+</tr>
+<tr>
+<td>Induct 归纳</td>
+<td>新写一个技能</td>
+<td>现有技能列表 + 困难样本 + 残差摘要</td>
+<td>完整 SKILL.md，或 <code>NONE</code></td>
+<td>每 2 轮，库少于 12 个</td>
+</tr>
+<tr>
+<td>Consolidate 合并</td>
+<td>把重复技能并成一个</td>
+<td>互相标记冗余的一组技能</td>
+<td>合并后的 SKILL.md</td>
+<td>每 3 轮</td>
+</tr>
+<tr>
+<td>Prune 剪枝</td>
+<td>删掉没用的技能</td>
+<td>每个技能的 SkillGradient</td>
+<td>不调 LLM；verdict 为 low_utility，或分数 ≤ <span class="arithmatex">\(-0.3\)</span> 即删</td>
+<td>每 3 轮</td>
+</tr>
+</tbody>
+</table>
+<p>调度由迭代编号决定：编号能被间隔整除，算子就启动（<code>OperatorSchedule</code>）。同一轮内执行顺序是 Refine → Consolidate → Prune → Induct。</p>
+<pre class="mermaid"><code>flowchart LR
+    SG["SkillGradient"] --&gt;|"verdict = refine"| R["Refine"]
+    SG --&gt;|"redundant_with 互相指向"| CO["Consolidate&lt;br/&gt;并查集分组"]
+    SG --&gt;|"low_utility 或分数 ≤ -0.3"| P["Prune"]
+    RS["residual_summary + 困难样本"] --&gt; I["Induct"]
+    R --&gt; K["候选库 K'"]
+    CO --&gt; K
+    P --&gt; K
+    I --&gt; K
+    K --&gt; V{"验证门&lt;br/&gt;逐 agent 判决"}</code></pre>
+<h3 id="34-验证门">3.4 验证门<a class="headerlink" href="#34-验证门" title="Permanent link">&para;</a></h3>
+<p>对每个"库被改动过的"agent：只把它换成新库、其他 agent 保持旧库，在同一批验证题上重新跑一遍，与"全部旧库"的分数比较：</p>
+<div class="arithmatex">\[
+\hat J_{val}(\mathcal{K}')\geq \hat J_{val}(\mathcal{K})-\delta
+\]</div>
+<p><span class="arithmatex">\(\delta\)</span> 默认 <span class="arithmatex">\(0.02\)</span>，用来吸收 LLM 采样带来的分数波动。判决单位是<strong>这个 agent 的整个库</strong>：同一轮里对它做的所有编辑（精修、归纳、合并、剪枝）一起采纳或一起回滚。</p>
+<h3 id="35-拓扑与-agent-之间的通信">3.5 拓扑与 agent 之间的通信<a class="headerlink" href="#35-拓扑与-agent-之间的通信" title="Permanent link">&para;</a></h3>
+<p>agent 数量很少：HotpotQA 2 个；LOCOMO 2 或 3 个（检索员 + 推理员 + 可选核验员）；GAIA 1 个或 2 个（研究员 + 解题员）。<strong>拓扑由配置写死，不是学出来的</strong>，训练只改技能库。agent 之间不直接通信，一切由环境用文本或正则搬运。</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant E as 环境
+    participant M as 主 agent
+    participant S as 子 agent
+    E-&gt;&gt;M: 只给问题, 不给候选段落
+    M--&gt;&gt;E: &lt;retrieve&gt;查询&lt;/retrieve&gt;
+    E-&gt;&gt;S: 完整任务 + 查询 (全新上下文)
+    S--&gt;&gt;E: 回答
+    E-&gt;&gt;M: &lt;retrieve_result&gt;回答&lt;/retrieve_result&gt;
+    M--&gt;&gt;E: 最终答案</code></pre>
+<table>
+<thead>
+<tr>
+<th>拓扑</th>
+<th>通信方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>decentralized</td>
+<td>顺序链：前一个 agent 的输出写入共享消息池，拼进后一个 agent 的输入；最后一个的输出是答案</td>
+</tr>
+<tr>
+<td>centralized</td>
+<td>如上图：主 agent 在文本里写 <code>&lt;retrieve&gt;</code> 标签，环境用正则抓出并调用子 agent；每次子 agent 都是全新上下文</td>
+</tr>
+<tr>
+<td>hybrid</td>
+<td>同 centralized，但子 agent 的历史输出会累积，下次被调用时一并告知</td>
+</tr>
+</tbody>
+</table>
+<p>GAIA 的两 agent 版本用 <code>HANDOFF: ... HANDOFF_TO_SOLVER</code> 交接，解题员可输出 <code>REQUEST_MORE</code> 让研究员再补一次。</p>
+<hr />
+<h2 id="4-残差residual详解">4. 残差（residual）详解<a class="headerlink" href="#4-残差residual详解" title="Permanent link">&para;</a></h2>
+<p>这是整个方法里最容易读糊涂的一块，单独讲。</p>
+<h3 id="41-它回答什么问题">4.1 它回答什么问题<a class="headerlink" href="#41-它回答什么问题" title="Permanent link">&para;</a></h3>
+<p>critic 对一条轨迹要回答两个<strong>不同</strong>的问题：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>对应输出</th>
+<th>用来做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>已有的每个技能，在这条轨迹里有没有帮上忙或添乱？</td>
+<td><code>SkillCredit</code>（每个 agent-技能 一份）</td>
+<td>决定已有技能要不要改、并、删</td>
+</tr>
+<tr>
+<td>这条轨迹里<strong>有没有哪里出了问题，但不是任何已有技能造成的</strong>？</td>
+<td><code>ResidualCredit</code>（每个 agent 一份）</td>
+<td>决定要不要<strong>新增</strong>技能</td>
+</tr>
+</tbody>
+</table>
+<p>类比：回归里"模型解释不了的那部分误差"叫残差。技能信用解释的是"已有技能能解释的部分"，残差记录的是"剩下解释不了的部分"。<strong>残差的含义是"这里可能缺一个技能"。</strong></p>
+<h3 id="42-它长什么样">4.2 它长什么样<a class="headerlink" href="#42-它长什么样" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nt">"residual"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"agent_1"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"summary"</span><span class="p">:</span><span class="w"> </span><span class="s2">"把同名的两个人物当成同一个人，未做区分"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"needs_new_skill"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"missing_capability"</span><span class="p">:</span><span class="w"> </span><span class="s2">"同名实体消歧"</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"agent_2"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"summary"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="nt">"needs_new_skill"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"missing_capability"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>summary</code>：文字，说明解释不了的问题是什么。</li>
+<li><code>needs_new_skill</code>：布尔，critic 判断是不是缺技能。</li>
+<li><code>missing_capability</code>：文字，缺的是什么能力。</li>
+<li><strong>没有数值分数。</strong> 数值分数（<code>utility_delta</code>）只存在于技能信用那一侧。</li>
+</ul>
+<h3 id="43-从产生到被使用的完整路径">4.3 从产生到被使用的完整路径<a class="headerlink" href="#43-从产生到被使用的完整路径" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    T["一条低分轨迹"] --&gt; Q{"critic 判断:&lt;br/&gt;失败能归因于某个已有技能吗?"}
+    Q --&gt;|"能"| S["写入 SkillCredit&lt;br/&gt;contribution + suggested_edit"]
+    Q --&gt;|"不能"| R["写入 ResidualCredit&lt;br/&gt;needs_new_skill = true&lt;br/&gt;missing_capability = ..."]
+    S --&gt; SG["跨轨迹聚合为 SkillGradient"]
+    SG --&gt; REF["Refine / Consolidate / Prune&lt;br/&gt;改已有技能"]
+    R --&gt; AGG["跨轨迹聚合&lt;br/&gt;只保留 needs_new_skill = true 的 summary&lt;br/&gt;按前 80 字符去重, 最多 5 条, 不调 LLM"]
+    AGG --&gt; RS["residual_summary&lt;br/&gt;每个 agent 一行文字"]
+    T --&gt;|"reward ≤ 0.5"| HC["困难样本&lt;br/&gt;每个 agent 一条证据"]
+    RS --&gt; IND["Induct&lt;br/&gt;新写一个技能"]
+    HC --&gt; IND
+    IND --&gt; NEW["新技能加入候选库&lt;br/&gt;provenance = induced"]
+    NEW --&gt; GATE{"验证门"}</code></pre>
+<h3 id="44-一个小案例残差如何催生新技能">4.4 一个小案例：残差如何催生新技能<a class="headerlink" href="#44-一个小案例残差如何催生新技能" title="Permanent link">&para;</a></h3>
+<p>设 <code>agent_1</code> 的库里没有任何"消歧"相关的技能。500 条轨迹里，有 30 条是这类题：问题涉及两个同名人物（一个作家、一个演员），agent_1 把二者混为一谈，最终答错。</p>
+<ol>
+<li><strong>批改</strong>：critic 看这 30 条时，发现问题不能归因于 <code>agent_1</code> 库里现有的任何技能（因为没有相关技能），于是在每条里写下</li>
+</ol>
+<p><code>residual.agent_1 = {summary: "把同名两人混为一人", needs_new_skill: true, missing_capability: "同名实体消歧"}</code></p>
+<ol>
+<li><strong>残差聚合</strong>：把这些 <code>summary</code> 去重后拼起来，得到</li>
+</ol>
+<p><code>residual_summary["agent_1"] = "把同名两人混为一人 (missing: 同名实体消歧)"</code></p>
+<ol>
+<li><strong>困难样本</strong>：这 30 条的 reward 都不超过 0.5，所以每条都会成为 <code>agent_1</code> 的困难样本证据，形如</li>
+</ol>
+<p><code>reward=0.00; residual=把同名两人混为一人; missing=同名实体消歧</code></p>
+<ol>
+<li><strong>Induct</strong>：LLM 收到的 prompt 里有"现有技能列表（避免重复）"、"Residual failure pattern: ..."、最多 6 条困难样本。它输出一个新技能：</li>
+</ol>
+<div class="highlight"><pre><span></span><code>---
+name: disambiguate-entities
+<span class="gu">description: 问题涉及可能重名的人或地点时，先核对描述性限定语</span>
+<span class="gu">---</span>
+适用条件：问题含人名或地名，且候选段落里出现多个同名项。
+做法：先列出各同名项及其限定语，再选与问题条件吻合的那个。
+</code></pre></div>
+<p>LLM 也可以认为不需要新技能，输出 <code>NONE</code>，那就什么都不加。</p>
+<ol>
+<li><strong>入库与验证</strong>：新技能 <code>provenance=induced</code>，分配不冲突的 <code>skill_id</code>，加入 <code>agent_1</code> 的候选库，随后和其他改动一起通过验证门。</li>
+</ol>
+<h3 id="45-几个容易误解的点">4.5 几个容易误解的点<a class="headerlink" href="#45-几个容易误解的点" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>残差和困难样本是两样东西，都喂给 Induct。</strong></li>
+<li>困难样本的筛选条件只看 reward ≤ 0.5，<strong>不看</strong> critic 是否说"需要新技能"。</li>
+<li>残差摘要只收 <code>needs_new_skill=true</code> 的文字。</li>
+<li>残差文字还会被追加到困难样本的证据里（<code>residual=...; missing=...</code>），让 Induct 看到更具体的线索。</li>
+<li><strong>残差只在 Induct 启动的那一轮才被用上。</strong> 默认每 2 轮一次（第 2、4、6 轮）。其他轮 critic 照样生成残差，但没有算子消费它。</li>
+<li><strong>第 1 轮的特殊情况</strong>：库是空的，没有"被调用的技能"，技能信用为空，critic 只能输出残差。但第 1 轮 Induct 不启动，所以这些残差要等到第 2 轮才被用。</li>
+<li><strong>Consolidate 和 Prune 完全不看残差</strong>，它们只看技能这条线的 <code>SkillGradient</code>。</li>
+<li><strong>每次 Induct 每个 agent 至多新增一个技能</strong>，且库不能超过 12 个。</li>
+<li>若开启 <code>--evolve-role</code>，同一份残差文字还会用来编辑 agent 的<strong>角色说明</strong>（默认不开）。</li>
+<li>残差是<strong>每个 agent 一份</strong>：同一条轨迹里，有的 agent 缺技能，有的不缺。</li>
+</ul>
+<hr />
+<h2 id="5-论文符号--代码位置">5. 论文符号 ↔ 代码位置<a class="headerlink" href="#5-论文符号--代码位置" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>论文</th>
+<th>含义</th>
+<th>代码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(\mathcal{K}_i\)</span>，<span class="arithmatex">\(k\)</span></td>
+<td>技能库、技能</td>
+<td><code>core/skills.py</code>：<code>SkillLibrary</code>、<code>Skill</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\xi_i\)</span></td>
+<td>技能调用轨迹</td>
+<td><code>core/skills.py</code>：<code>build_skill_trace</code>、<code>detect_invoked_skills</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(C^{text}(\tau,k)\)</span></td>
+<td>单条轨迹的技能信用</td>
+<td><code>core/skill_credit.py</code>：<code>SkillCreditCritic</code>、<code>SkillCredit</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(C^{text}(\tau)\)</span></td>
+<td>agent 级残差信用</td>
+<td>同上：<code>ResidualCredit</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(g\)</span>，<span class="arithmatex">\(G(k)\)</span>（Eq.6–7）</td>
+<td>轨迹级、批级编辑方向</td>
+<td><code>core/skill_operators.py</code>：<code>aggregate_skill_gradients</code>、<code>SkillGradient</code></td>
+</tr>
+<tr>
+<td>Eq.8 动量</td>
+<td>参考上一轮方向</td>
+<td>发布代码中 <code>momentum=0.0</code>，未见传入上一轮 <span class="arithmatex">\(G\)</span> 的实现</td>
+</tr>
+<tr>
+<td>Eq.9 精修</td>
+<td><span class="arithmatex">\(k\leftarrow k\oplus\Delta k\)</span></td>
+<td><code>refine_skill</code></td>
+</tr>
+<tr>
+<td>Eq.10 归纳</td>
+<td>新技能</td>
+<td><code>induce_skill</code></td>
+</tr>
+<tr>
+<td>Eq.11 合并</td>
+<td>合并</td>
+<td><code>detect_redundancy_groups</code>、<code>consolidate_skills</code></td>
+</tr>
+<tr>
+<td>Eq.12 剪枝</td>
+<td>删除</td>
+<td><code>select_skills_to_prune</code></td>
+</tr>
+<tr>
+<td>Eq.13–14 验证门</td>
+<td>信赖域回滚</td>
+<td><code>trainer/skill_evolution.py</code>：<code>_validation_gate</code></td>
+</tr>
+<tr>
+<td>一轮迭代</td>
+<td>整体流程</td>
+<td><code>trainer/skill_evolution.py</code>：<code>train_one_iteration</code></td>
+</tr>
+<tr>
+<td>训练主循环</td>
+<td>迭代、基线、评测</td>
+<td><code>trainer/monte_carlo.py</code>：<code>train</code></td>
+</tr>
+<tr>
+<td>环境与拓扑</td>
+<td>rollout</td>
+<td><code>envs/language/env.py</code>：<code>_collect_trajectory_decentralized</code> / <code>_centralized</code></td>
+</tr>
+<tr>
+<td>奖励</td>
+<td>token-F1</td>
+<td><code>envs/language/reward.py</code></td>
+</tr>
+<tr>
+<td>算子调度</td>
+<td>间隔表</td>
+<td><code>OperatorSchedule</code></td>
+</tr>
+</tbody>
+</table>
+<p>读代码建议顺序：<code>train_one_iteration</code>（主流程，注释按 Phase 分段）→ <code>skill_credit.py</code>（critic 的 prompt 与解析）→ <code>skill_operators.py</code>（聚合与四个算子的 prompt）→ <code>language/env.py</code>（rollout）。</p>
+<hr />
+<h2 id="6-实验结果">6. 实验结果<a class="headerlink" href="#6-实验结果" title="Permanent link">&para;</a></h2>
+<p>设置：critic、聚合与算子用 GPT-5.1；任务 agent 用 GPT-4o-mini（HotpotQA、LoCoMo）、Qwen2.5-7B（GAIA）。</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>指标</th>
+<th>MASkills</th>
+<th>最强基线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HotpotQA</td>
+<td>F1</td>
+<td>76.3</td>
+<td>69.2</td>
+</tr>
+<tr>
+<td>LoCoMo 单跳</td>
+<td>F1 / BLEU</td>
+<td>27.61 / 21.30</td>
+<td>26.65 / 17.72</td>
+</tr>
+<tr>
+<td>LoCoMo 多跳</td>
+<td>F1 / BLEU</td>
+<td>17.22 / 12.87</td>
+<td>12.04 / 11.16</td>
+</tr>
+<tr>
+<td>GAIA</td>
+<td>平均</td>
+<td>23.3</td>
+<td>20.4</td>
+</tr>
+</tbody>
+</table>
+<p>拓扑对比：decentralized 在 HotpotQA（76.30）和 GAIA（23.30）最好；centralized 在 LoCoMo 多跳最好（F1 22.27，对 17.22）。</p>
+<p>消融（全模型：LoCoMo 多跳 17.2，GAIA 23.3）：</p>
+<table>
+<thead>
+<tr>
+<th>去掉的组件</th>
+<th>LoCoMo 多跳</th>
+<th>GAIA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技能信用分配</td>
+<td>14.2</td>
+<td>17.1</td>
+</tr>
+<tr>
+<td>动量平滑</td>
+<td>16.4</td>
+<td>21.9</td>
+</tr>
+<tr>
+<td>验证回滚</td>
+<td>6.6</td>
+<td>13.5</td>
+</tr>
+<tr>
+<td>合并与剪枝</td>
+<td>13.9</td>
+<td>13.0</td>
+</tr>
+</tbody>
+</table>
+<p>去掉验证回滚掉得最多，说明 LLM 自动改写技能本身风险很高，回滚是最重要的护栏。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
