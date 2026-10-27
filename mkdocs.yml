@@ -1,5 +1,5 @@
 site_name: Agent 论文与源码学习笔记
-site_description: 多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、mini-swe-agent）
+site_description: 多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、MASkills、mini-swe-agent）
 theme:
   name: material
   language: zh
@@ -22,6 +22,9 @@ markdown_extensions:
         - name: math
           class: arithmatex
           format: !!python/object/apply:pymdownx.arithmatex.arithmatex_fenced_format {kwds: {mode: generic}}
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tasklist:
       custom_checkbox: true
 hooks:
@@ -34,6 +37,8 @@ nav:
   - ARG-Designer:
       - 论文阅读笔记: arg-designer/paper-reading.md
       - 学习大纲: arg-designer/learning-outline.md
+  - MASkills:
+      - 论文阅读笔记: maskills/paper-reading.md
   - mini-swe-agent:
       - 概览: mini-swe-agent/index.md
       - 第一讲 宏观架构与控制流: mini-swe-agent/mini_swe_agent_study_notes_lecture1.md

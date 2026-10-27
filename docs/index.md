@@ -9,6 +9,12 @@
 - [论文阅读笔记](arg-designer/paper-reading.md)：按"读的时候提的问题"组织，配原论文插图，含论文 vs 代码差异清单。
 - [学习大纲](arg-designer/learning-outline.md)：论文设计 ↔ 代码实现，以及工程语法的学习路线。
 
+## MASkills
+
+论文 [*MASkills: Continual Skills Optimization for Multi-Agent LLM Systems*](https://arxiv.org/abs/2609.02094) 与官方仓库 [DaRL-GenAI/MASkills](https://github.com/DaRL-GenAI/MASkills)。
+
+- [论文阅读笔记](maskills/paper-reading.md)：先给全局流水线和一轮迭代的流程图，再用一个任务走完整个流程，单独讲了"残差"，最后给出论文符号 ↔ 代码位置对照。
+
 ## mini-swe-agent
 
 开源仓库 [SWE-agent/mini-swe-agent](https://github.com/SWE-agent/mini-swe-agent) 的源码研读笔记，共七讲加一篇番外。见 [概览](mini-swe-agent/index.md)。
