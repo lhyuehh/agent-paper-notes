@@ -1,5 +1,5 @@
 site_name: Agent 论文与源码学习笔记
-site_description: 多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、MASkills、mini-swe-agent）
+site_description: 多智能体 / Agent 论文与开源仓库的阅读笔记（ARG-Designer、MASkills、CodeR、mini-swe-agent）
 theme:
   name: material
   language: zh
@@ -41,6 +41,8 @@ nav:
   - MASkills:
       - 概览: maskills/index.md
       - 论文阅读笔记: maskills/paper-reading.md
+  - CodeR:
+      - 概览: coder/index.md
   - mini-swe-agent:
       - 概览: mini-swe-agent/index.md
       - 第一讲 宏观架构与控制流: mini-swe-agent/mini_swe_agent_study_notes_lecture1.md

@@ -8,4 +8,5 @@
 | --- | --- | --- |
 | [ARG-Designer](https://github.com/Shiy-Li/ARG-Designer) | 论文 *Assemble Your Crew*（AAAI 2026 Oral） | [概览](arg-designer/index.md) |
 | [MASkills](https://github.com/DaRL-GenAI/MASkills) | 论文 *MASkills: Continual Skills Optimization for Multi-Agent LLM Systems* | [概览](maskills/index.md) |
+| [CodeR](https://github.com/NL2Code/CodeR) | 论文 *CodeR: Issue Resolving with Multi-Agent and Task Graphs*，结论是只有轨迹数据可用 | [概览](coder/index.md) |
 | [mini-swe-agent](https://github.com/SWE-agent/mini-swe-agent) | 源码研读，共七讲加一篇番外 | [概览](mini-swe-agent/index.md) |
